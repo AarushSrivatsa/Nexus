@@ -9,7 +9,6 @@ PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 CF_API_TOKEN = os.getenv("CF_API_TOKEN")
 CF_ACCOUNT_ID = os.getenv("CF_ACCOUNT_ID")
-RESEND_API_KEY = os.getenv("RESEND_API_KEY")
 
 SECRET_KEY = os.getenv("SECRET_KEY", "change-this-secret-key-in-production")
 ALGORITHM = "HS256"
@@ -29,7 +28,5 @@ RERANK_MODEL = "ms-marco-MiniLM-L-12-v2"
 MESSAGE_LIMIT = 25
 FILE_EVENT_PREFIX = "024b4faf-5861-4f6b-840c-8f9b4cb660b1_"
 
-SMTP_EMAIL = os.getenv("SMTP_EMAIL")
-SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
-SMTP_PORT = 587
-SMTP_SERVER = "smtp-relay.brevo.com"
+BREVO_SENDER_EMAIL = "pitlaaarushsrivatsa@gmail.com"
+BREVO_API_KEY = os.getenv("BREVO_API_KEY")

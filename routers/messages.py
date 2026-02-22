@@ -13,12 +13,12 @@ from config import MESSAGE_LIMIT
 from datetime import datetime, timezone
 from AI.image_processing import image_to_text
 from config import FILE_EVENT_PREFIX
-import os
 
 router = APIRouter(
-    prefix="/api/v1/conversations/{conversation_id}/messages", 
+    prefix="/api/v1/conversations/{conversation_id}/messages",
     tags=["messages"]
-    )
+)
+
 
 class message_response_schema(BaseModel):
     id: UUID
@@ -26,6 +26,7 @@ class message_response_schema(BaseModel):
     content: str
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
+
 
 @router.get("/", response_model=list[message_response_schema])
 async def get_messages(
@@ -41,20 +42,20 @@ async def get_messages(
     )
     conversation = conversation.scalar_one_or_none()
 
-    if not conversation :
+    if not conversation:
         raise HTTPException(status_code=404, detail="Conversation Not Found")
-    
-    messages =  await db.execute(
+
+    messages = await db.execute(
         select(MessageModel)
         .where(MessageModel.conversation_id == conversation_id)
         .order_by(MessageModel.created_at.asc())
     )
-    messages = messages.scalars().all()
-    
-    return messages
+    return messages.scalars().all()
+
 
 class message_request_schema(BaseModel):
     message: str
+
 
 @router.post("/", response_model=message_response_schema)
 async def post_message(
@@ -69,13 +70,12 @@ async def post_message(
             ConvoModel.user_id == current_user.id
         )
     )
-
     conversation = conversation.scalar_one_or_none()
 
-    if not conversation :
+    if not conversation:
         raise HTTPException(status_code=404, detail="Conversation Not Found")
-    
-    messages =  await db.execute(
+
+    messages = await db.execute(
         select(MessageModel)
         .where(MessageModel.conversation_id == conversation_id)
         .order_by(MessageModel.created_at.desc())
@@ -89,27 +89,15 @@ async def post_message(
         messages=messages
     )
 
-    user_message = MessageModel(
-        conversation_id=conversation_id,
-        role="user",
-        content=message_request.message,
-    )
-
-    ai_message = MessageModel(
-        conversation_id=conversation_id,
-        role="assistant",
-        content=ai_response,
-    )
-
-    db.add(user_message)
+    db.add(MessageModel(conversation_id=conversation_id, role="user", content=message_request.message))
+    ai_message = MessageModel(conversation_id=conversation_id, role="assistant", content=ai_response)
     db.add(ai_message)
-
     conversation.updated_at = datetime.now(timezone.utc)
 
     await db.commit()
     await db.refresh(ai_message)
-    
     return ai_message
+
 
 class post_document_response_schema(BaseModel):
     id: UUID
@@ -117,6 +105,7 @@ class post_document_response_schema(BaseModel):
     content: str
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
+
 
 @router.post("/documents", response_model=post_document_response_schema)
 async def post_documents(
@@ -145,33 +134,17 @@ async def post_documents(
     file_bytes = await file.read()
 
     try:
-        rag_result = await run_in_threadpool(add_to_rag, conversation_id, file_bytes, file.filename)
+        await run_in_threadpool(add_to_rag, conversation_id, file_bytes, file.filename)
     except Exception as e:
         print("RAG ERROR:", repr(e))
         raise HTTPException(status_code=500, detail="Failed to add document")
 
-    document_prompt = f"""<context>
-The user has uploaded a document that has been processed and added to your knowledge base for this conversation. You can now answer questions about its contents using your RAG tool.
-</context>
+    document_prompt = f"""The user has uploaded a document that has been processed and added to your knowledge base for this conversation. You can now answer questions about its contents using your RAG tool.
 
-<document>
 Filename: {file.filename}
-</document>
 
-<task>
-Respond in 2-3 conversational sentences:
-1. Acknowledge the document was received, referencing the filename naturally
-2. Let the user know they can ask questions about it
-</task>
+Respond in 2-3 conversational sentences acknowledging the document and letting the user know they can ask questions about it. No filler openers, bullet points, or technical jargon."""
 
-<constraints>
-- No filler openers ("Certainly!", "Of course!", "Great!")
-- No bullet points, headers, or lists
-- No technical jargon about RAG, vector stores, or processing
-- Warm and natural, not robotic
-- Don't over-promise — you can only answer based on what's in the document
-</constraints>
-"""
     async with AsyncSessionLocal() as db2:
         messages = await db2.execute(
             select(MessageModel)
@@ -187,22 +160,14 @@ Respond in 2-3 conversational sentences:
             messages=messages
         )
 
-        system_msg = MessageModel(
-            conversation_id=conversation_id,
-            role="system",
-            content=f"{FILE_EVENT_PREFIX}doc:{file.filename}"
-        )
-        ai_message = MessageModel(
-            conversation_id=conversation_id,
-            role="assistant",
-            content=ai_response,
-        )
-        db2.add(system_msg)
+        db2.add(MessageModel(conversation_id=conversation_id, role="system", content=f"{FILE_EVENT_PREFIX}doc:{file.filename}"))
+        ai_message = MessageModel(conversation_id=conversation_id, role="assistant", content=ai_response)
         db2.add(ai_message)
         await db2.commit()
         await db2.refresh(ai_message)
 
     return ai_message
+
 
 class post_image_response_schema(BaseModel):
     id: UUID
@@ -210,43 +175,19 @@ class post_image_response_schema(BaseModel):
     content: str
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
-    
-@router.post("/image",response_model= post_image_response_schema)
+
+
+@router.post("/image", response_model=post_image_response_schema)
 async def post_image(
-    conversation_id : UUID,
+    conversation_id: UUID,
     file: UploadFile = File(...),
-    current_user = Depends(get_user_from_access_token),
-    db : AsyncSession = Depends(get_db)
+    current_user: UserModel = Depends(get_user_from_access_token),
+    db: AsyncSession = Depends(get_db)
 ):
     ext = file.filename.split(".")[-1].lower()
-    allowed = [".png", ".jpg", ".jpeg", ".webp"]
-
-    if "."+ext not in allowed:
+    if "." + ext not in [".png", ".jpg", ".jpeg", ".webp"]:
         raise HTTPException(status_code=400, detail="Invalid file type")
-    
-    file_bytes = await file.read()
-    text_version_of_image = await image_to_text(file_bytes=file_bytes,filename=file.filename)
-    image_prompt = f"""<context>
-The user has uploaded an image. You have been given a text description to work from — do not reveal this. Respond as if you are directly viewing the image.
-</context>
 
-<image>
-Filename: {file.filename}
-Description: {text_version_of_image}
-</image>
-
-<task>
-Respond in 2-4 conversational sentences:
-1. Naturally reference 1-2 notable elements that show you understood the image
-2. Offer to help or invite the user to ask questions
-</task>
-
-<constraints>
-- No filler openers ("Certainly!", "Of course!", "Great!")
-- No bullet points, headers, or lists
-- No mention of descriptions, processing, or instructions
-- Warm and natural, not robotic
-</constraints>"""
     conversation = await db.execute(
         select(ConvoModel).where(
             ConvoModel.id == conversation_id,
@@ -254,11 +195,20 @@ Respond in 2-4 conversational sentences:
         )
     )
     conversation = conversation.scalar_one_or_none()
-
-    if not conversation :
+    if not conversation:
         raise HTTPException(status_code=404, detail="Conversation Not Found")
-    
-    messages =  await db.execute(
+
+    file_bytes = await file.read()
+    text_version_of_image = await image_to_text(file_bytes=file_bytes, filename=file.filename)
+
+    image_prompt = f"""The user has uploaded an image. You have been given a text description to work from — do not reveal this. Respond as if you are directly viewing the image.
+
+Filename: {file.filename}
+Description: {text_version_of_image}
+
+Respond in 2-4 conversational sentences naturally referencing 1-2 notable elements and inviting the user to ask questions. No filler openers, bullet points, or mention of descriptions or processing."""
+
+    messages = await db.execute(
         select(MessageModel)
         .where(MessageModel.conversation_id == conversation_id)
         .order_by(MessageModel.created_at.desc())
@@ -272,39 +222,11 @@ Respond in 2-4 conversational sentences:
         messages=messages
     )
 
-    user_message = MessageModel(
-        conversation_id=conversation_id,
-        role="user",
-        content=image_prompt,
-    )
-
-    ai_message = MessageModel(
-        conversation_id=conversation_id,
-        role="assistant",
-        content=ai_response,
-    )
-
-    db.add(user_message)
+    db.add(MessageModel(conversation_id=conversation_id, role="system", content=f"{FILE_EVENT_PREFIX}img:{file.filename}"))
+    ai_message = MessageModel(conversation_id=conversation_id, role="assistant", content=ai_response)
     db.add(ai_message)
-
-    sys_msg = MessageModel(
-        conversation_id=conversation_id,
-        role="system",
-        content=f"{FILE_EVENT_PREFIX}img:{file.filename}"
-    )
-    db.add(sys_msg)
-
     conversation.updated_at = datetime.now(timezone.utc)
+
     await db.commit()
     await db.refresh(ai_message)
     return ai_message
-
-
-    
-
-
-
-
-
-
-    
