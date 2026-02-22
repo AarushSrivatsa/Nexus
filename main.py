@@ -30,7 +30,10 @@ app = FastAPI(
 Built by **Aarush Srivatsa**
 GitHub Docs Link: https://github.com/AarushSrivatsa/Chatbot-Wrapper-Project-Backend-OpenDocs
 Linkedin Profile: https://www.linkedin.com/in/aarushsrivatsa/
-""", lifespan=lifespan)
+""", lifespan=lifespan,     
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None)
 
 for router in router_list:
     app.include_router(router)

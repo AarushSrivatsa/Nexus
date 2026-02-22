@@ -50,6 +50,9 @@ body::before{
   letter-spacing:.18em;color:var(--t1);
   background:var(--ag);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
+.auth-byline{font-size:10px;color:var(--t3);font-family:'Space Grotesk',sans-serif;font-weight:500;letter-spacing:.04em;margin-top:2px;}
+.auth-byline-link{color:var(--t3);text-decoration:none;transition:color .2s;}
+.auth-byline-link:hover{color:var(--a);}
 .auth-h{font-family:'Space Grotesk',sans-serif;font-size:25px;font-weight:600;letter-spacing:-.02em;margin-bottom:6px;line-height:1.2;}
 .auth-sub{font-size:13px;color:var(--t3);margin-bottom:32px;}
 .seg{display:flex;background:var(--s1);border:1px solid var(--b1);border-radius:13px;padding:4px;margin-bottom:26px;gap:3px;}
@@ -153,7 +156,11 @@ body::before{
 }
 .sb-item:hover .sb-del{display:flex;}
 .sb-del:hover{color:var(--danger);}
-.sb-foot{padding:10px;border-top:1px solid var(--b1);}
+.sb-brand-text{display:flex;flex-direction:column;gap:1px;}
+.sb-byline{font-size:9px;color:var(--t3);font-family:'Space Grotesk',sans-serif;font-weight:500;letter-spacing:.04em;}
+.sb-byline-link{color:var(--t3);text-decoration:none;transition:color .2s;}
+.sb-byline-link:hover{color:var(--a);}
+.sb-foot{padding:10px;border-top:1px solid var(--b1);display:flex;flex-direction:column;gap:6px;}
 .sb-logout{
   width:100%;padding:11px;background:transparent;border:1px solid var(--danger)2e;
   border-radius:11px;cursor:pointer;font-family:'Space Grotesk',sans-serif;
@@ -339,7 +346,10 @@ body::before{
           <circle cx="12" cy="12" r="3" fill="#000"/>
         </svg>
       </div>
-      <span class="auth-logo-name">NEXUS</span>
+      <div>
+        <span class="auth-logo-name">NEXUS</span>
+        <div class="auth-byline">by <a href="https://www.linkedin.com/in/aarushsrivatsa/" target="_blank" rel="noopener" class="auth-byline-link">Aarush Srivatsa</a></div>
+      </div>
     </div>
     <h1 class="auth-h" id="auth-heading">Welcome back</h1>
     <p class="auth-sub" id="auth-subtext">Sign in to continue</p>
@@ -436,7 +446,12 @@ body::before{
           <circle cx="12" cy="12" r="2.5" fill="#000"/>
         </svg>
       </div>
-      <span class="sb-name">NEXUS</span>
+      <div class="sb-brand-text">
+        <span class="sb-name">NEXUS</span>
+        <span class="sb-byline">by
+          <a href="https://www.linkedin.com/in/aarushsrivatsa/" target="_blank" rel="noopener" class="sb-byline-link">Aarush Srivatsa</a>
+        </span>
+      </div>
     </div>
   </div>
   <div class="sb-new-wrap">
