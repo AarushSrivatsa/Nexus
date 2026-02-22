@@ -3,7 +3,7 @@ sqlalchemy[asyncio]
 langchain
 langchain-groq
 pydantic
-dotenv
+python-dotenv
 argon2-cffi
 python-jose
 fastapi
