@@ -32,4 +32,4 @@ FILE_EVENT_PREFIX = "024b4faf-5861-4f6b-840c-8f9b4cb660b1_"
 SMTP_EMAIL = os.getenv("SMTP_EMAIL")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
 SMTP_PORT = 587
-SMTP_SERVER = "smtp.gmail.com"
+SMTP_SERVER = "smtp-relay.brevo.com"

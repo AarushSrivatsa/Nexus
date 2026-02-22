@@ -1,10 +1,10 @@
 import secrets
-import resend
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from fastapi import BackgroundTasks
-from config import RESEND_API_KEY
+from config import SMTP_EMAIL, SMTP_PASSWORD, SMTP_PORT, SMTP_SERVER
 from datetime import datetime
-
-resend.api_key = RESEND_API_KEY
 
 def generate_otp(length: int = 6) -> str:
     digits = "0123456789"
@@ -12,6 +12,19 @@ def generate_otp(length: int = 6) -> str:
 
 def email_the_otp(email: str, otp: str):
     try:
+        msg = MIMEMultipart("alternative")
+        msg["From"] = f"Verification <{SMTP_EMAIL}>"
+        msg["To"] = email
+        msg["Subject"] = "Your verification code"
+
+        # Plain-text fallback
+        text = f"""
+Your OTP is: {otp}
+
+This code is valid for 5 minutes.
+If you didn't request this, ignore this email.
+"""
+
         html = f"""
 <!DOCTYPE html>
 <html>
@@ -19,77 +32,59 @@ def email_the_otp(email: str, otp: str):
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Verify your identity</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet">
 </head>
-<body style="margin:0;padding:0;background:#080b0f;font-family:'Plus Jakarta Sans',sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="min-height:100vh;background:#080b0f;">
+<body style="margin:0; padding:0; background:#0d0d0d; font-family:'Fraunces', Georgia, serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="min-height:100vh; background:#0d0d0d;">
     <tr>
       <td align="center" style="padding:60px 20px;">
-        <table width="460" cellpadding="0" cellspacing="0" style="max-width:100%;">
+        <table width="480" cellpadding="0" cellspacing="0" style="max-width:100%;">
 
-          <!-- Logo -->
+          <!-- Top label -->
           <tr>
-            <td style="padding-bottom:32px;text-align:center;">
-              <table cellpadding="0" cellspacing="0" style="margin:0 auto;">
-                <tr>
-                  <td style="
-                    background:linear-gradient(135deg,#00d4ff,#0099cc);
-                    border-radius:10px;
-                    width:32px;height:32px;
-                    text-align:center;
-                    vertical-align:middle;
-                    font-family:'Plus Jakarta Sans',sans-serif;
-                    font-size:14px;font-weight:800;color:#000;
-                    padding:0;line-height:32px;
-                  ">N</td>
-                  <td style="padding-left:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.08em;color:#8899b4;">
-                    NEXUS
-                  </td>
-                </tr>
-              </table>
+            <td style="padding-bottom:24px; text-align:center;">
+              <span style="font-family:'DM Mono', monospace; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#555555;">
+                verification required
+              </span>
             </td>
           </tr>
 
           <!-- Main card -->
           <tr>
-            <td style="
-              background:#0d1117;
-              border-radius:20px;
-              border:1px solid #1e2a3a;
-              overflow:hidden;
-            ">
-              <!-- Accent line -->
-              <div style="height:2px;background:linear-gradient(90deg,#00d4ff,#0099cc);"></div>
+            <td style="background:#161616; border-radius:4px; border:1px solid #2a2a2a; overflow:hidden;">
+
+              <!-- Thin accent line -->
+              <div style="height:3px; background:linear-gradient(90deg, #c8f542 0%, #42f5b3 100%);"></div>
 
               <!-- Body -->
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td style="padding:44px 44px 36px;">
+                  <td style="padding:52px 48px 40px;">
 
-                    <p style="margin:0 0 6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:600;color:#e2eaf5;line-height:1.3;letter-spacing:-0.02em;">
-                      Verify your identity
+                    <p style="margin:0 0 8px; font-family:'Fraunces', Georgia, serif; font-size:28px; font-weight:600; color:#f0f0f0; line-height:1.2;">
+                      Here's your code.
                     </p>
-                    <p style="margin:0 0 36px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:400;color:#4a5a72;line-height:1.6;">
-                      Use the code below to complete your sign in. Valid for 5 minutes.
+                    <p style="margin:0 0 44px; font-family:'Fraunces', Georgia, serif; font-style:italic; font-size:16px; font-weight:300; color:#666666; line-height:1.5;">
+                      Use it within the next 5 minutes.
                     </p>
 
-                    <!-- OTP box -->
+                    <!-- OTP display -->
                     <table width="100%" cellpadding="0" cellspacing="0">
                       <tr>
                         <td style="
-                          background:#080b0f;
-                          border:1px solid #1e2a3a;
-                          border-radius:14px;
-                          padding:28px 20px;
+                          background:#0d0d0d;
+                          border:1px solid #2a2a2a;
+                          border-radius:4px;
+                          padding:32px 24px;
                           text-align:center;
                         ">
                           <span style="
-                            font-family:'Fira Code',monospace;
-                            font-size:38px;
+                            font-family:'DM Mono', monospace;
+                            font-size:42px;
                             font-weight:500;
-                            letter-spacing:14px;
-                            color:#00d4ff;
-                            text-indent:14px;
+                            letter-spacing:16px;
+                            color:#c8f542;
+                            text-indent:16px;
                             display:inline-block;
                           ">{otp}</span>
                         </td>
@@ -97,26 +92,26 @@ def email_the_otp(email: str, otp: str):
                     </table>
 
                     <!-- Expiry pill -->
-                    <table cellpadding="0" cellspacing="0" style="margin:20px 0 0;">
+                    <table cellpadding="0" cellspacing="0" style="margin:28px 0 0;">
                       <tr>
                         <td style="
-                          padding:6px 14px;
-                          background:#00d4ff12;
-                          border-radius:100px;
-                          border:1px solid #00d4ff22;
+                          padding:8px 16px;
+                          background:#1e2a10;
+                          border-radius:2px;
+                          border:1px solid #3a4f1a;
                         ">
-                          <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;color:#00d4ff;letter-spacing:0.04em;">
-                            ⏳ &nbsp;Expires in 5 minutes
+                          <span style="font-family:'DM Mono', monospace; font-size:12px; color:#9ab84a; letter-spacing:1px;">
+                            ⏳ expires in 5 minutes
                           </span>
                         </td>
                       </tr>
                     </table>
 
                     <!-- Divider -->
-                    <div style="height:1px;background:#1e2a3a;margin:36px 0;"></div>
+                    <div style="height:1px; background:#222222; margin:40px 0;"></div>
 
-                    <p style="margin:0;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#4a5a72;line-height:1.8;">
-                      Didn't request this? You can safely ignore this email — no action needed.
+                    <p style="margin:0; font-family:'Fraunces', Georgia, serif; font-style:italic; font-size:13px; color:#444444; line-height:1.8;">
+                      Didn't ask for this? You can safely ignore it —<br>no action is needed on your part.
                     </p>
 
                   </td>
@@ -126,9 +121,9 @@ def email_the_otp(email: str, otp: str):
               <!-- Footer -->
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td style="padding:18px 44px;border-top:1px solid #111820;">
-                    <p style="margin:0;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#253347;letter-spacing:0.04em;">
-                      © {datetime.now().year} Nexus — all rights reserved
+                  <td style="padding:20px 48px; border-top:1px solid #1e1e1e;">
+                    <p style="margin:0; font-family:'DM Mono', monospace; font-size:11px; color:#333333; letter-spacing:1px;">
+                      © {datetime.now().year} — all rights reserved
                     </p>
                   </td>
                 </tr>
@@ -144,14 +139,13 @@ def email_the_otp(email: str, otp: str):
 </body>
 </html>
 """
+        msg.attach(MIMEText(text, "plain"))
+        msg.attach(MIMEText(html, "html"))
 
-        resend.Emails.send({
-            "from": "Nexus <noreply@yourdomain.com>",
-            "to": email,
-            "subject": "Your Nexus verification code",
-            "html": html,
-            "text": f"Your Nexus OTP is: {otp}\n\nThis code expires in 5 minutes.\nIf you didn't request this, ignore this email."
-        })
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()
+            server.login(SMTP_EMAIL, SMTP_PASSWORD)
+            server.send_message(msg)
 
     except Exception as e:
         print("Email error:", e)
