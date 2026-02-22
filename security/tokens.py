@@ -1,0 +1,68 @@
+from datetime import datetime, timezone, timedelta
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from uuid import UUID  
+from config import ALGORITHM, SECRET_KEY, ACCESS_TOKEN_EXPIRE_HOURS, REFRESH_TOKEN_EXPIRE_DAYS
+from jose import jwt
+from secrets import token_urlsafe
+from hashlib import sha256
+from database.models import RefreshTokenModel
+from fastapi import HTTPException, Depends
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from database.initialization import get_db
+from database.models import UserModel
+
+def hash_refresh_token(token: str) -> str:
+    return sha256(token.encode("utf-8")).hexdigest()
+
+async def create_tokens(user_id: UUID, db: AsyncSession) -> dict:  # Changed to UUID
+    # Create access token
+    expire = datetime.now(tz=timezone.utc) + timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS)
+    to_encode = {"sub": str(user_id), "exp": expire}
+    access_token = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    
+    # Create refresh token
+    refresh_token = token_urlsafe(64)
+    token_hash = hash_refresh_token(refresh_token)
+    
+    # Save refresh token to DB
+    refresh_expires = datetime.now(tz=timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    db_refresh_token = RefreshTokenModel(
+        user_id=user_id,
+        token_hash=token_hash,
+        expires_at=refresh_expires
+    )
+    db.add(db_refresh_token)
+    await db.commit()
+
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer"
+    }
+
+security = HTTPBearer()
+
+async def get_user_from_access_token(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: AsyncSession = Depends(get_db)
+) -> UserModel:
+    token = credentials.credentials
+
+    try: 
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        # Remove this check - you're not adding "type" to token
+        # if payload.get("type") != "access":
+        #     raise HTTPException(status_code=401, detail="Invalid token type")
+        user_id = UUID(payload["sub"])  # Convert string to UUID
+
+    except Exception:  # Catch all exceptions
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+    result = await db.execute(select(UserModel).where(UserModel.id == user_id))
+    user = result.scalar_one_or_none()
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    
+    return user
