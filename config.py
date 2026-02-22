@@ -9,6 +9,7 @@ PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 CF_API_TOKEN = os.getenv("CF_API_TOKEN")
 CF_ACCOUNT_ID = os.getenv("CF_ACCOUNT_ID")
+RESEND_API_KEY = os.getenv("RESEND_API_KEY")
 
 SECRET_KEY = os.getenv("SECRET_KEY", "change-this-secret-key-in-production")
 ALGORITHM = "HS256"
