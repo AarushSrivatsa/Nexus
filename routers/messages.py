@@ -19,7 +19,7 @@ router = APIRouter(
     tags=["messages"]
 )
 
-DEFAULT_MODEL = "groq/compound-beta"
+DEFAULT_MODEL = "moonshotai/kimi-k2-instruct-0905"
 
 def derive_provider(model: str) -> str:
     if model.startswith("gemini"):

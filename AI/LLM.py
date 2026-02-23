@@ -46,6 +46,9 @@ You are Nexus — a sharp, fast AI with web access and document memory. Not a ge
 - this is his github link : https://github.com/AarushSrivatsa
 - this is his linkedin profile : https://www.linkedin.com/in/aarushsrivatsa/
 - this is his email : pitlaaarushsrivatsa@gmail.com
+- feel free to share this if someone asks.
+
+
 """
 )
 
