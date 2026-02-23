@@ -2,7 +2,7 @@ from database.initialization import Base, engine
 import asyncio
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import Column, String, DateTime, ForeignKey, Text, Boolean,text, Integer
+from sqlalchemy import Column, String, DateTime, ForeignKey, Text, Boolean,text, Integer, Index
 from sqlalchemy.sql import func
 from datetime import datetime, timezone
 
@@ -40,6 +40,10 @@ class MessageModel(Base):
     content = Column(Text, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     convo = relationship("ConvoModel", back_populates="messages")
+
+    __table_args__ = (
+        Index('ix_messages_conv_created', 'conversation_id', 'created_at'),
+    )
 
 class RefreshTokenModel(Base):
     __tablename__ = "refresh_tokens"

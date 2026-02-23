@@ -26,7 +26,7 @@ if not pc.has_index(INDEX_NAME):
     )
 index = pc.Index(INDEX_NAME)
 
-def add_to_rag(conversation_id: str, file_bytes: bytes, filename: str) -> str:
+def add_to_rag(conversation_id: UUID, file_bytes: bytes, filename: str) -> str:
     """Insert file into vector database for a specific conversation."""
     namespace = str(conversation_id)
     
