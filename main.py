@@ -5,6 +5,7 @@ from fastapi.responses import FileResponse
 from routers.authentication import router as authentication_router
 from routers.conversations import router as conversation_router
 from routers.messages import router as message_router
+from routers.models import router as model_router
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -13,7 +14,7 @@ from utilities.scheduled_tasks import delete_unnecessary_otps_in_db
 
 
 scheduler = AsyncIOScheduler()
-router_list = [authentication_router,conversation_router,message_router]
+router_list = [authentication_router,conversation_router,message_router,model_router]
 task_list = [delete_unnecessary_otps_in_db]
 
 @asynccontextmanager

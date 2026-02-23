@@ -19,6 +19,13 @@ router = APIRouter(
     tags=["messages"]
 )
 
+DEFAULT_MODEL = "groq/compound-beta"
+
+def derive_provider(model: str) -> str:
+    if model.startswith("gemini"):
+        return "google"
+    return "groq"
+
 
 class message_response_schema(BaseModel):
     id: UUID
@@ -41,7 +48,6 @@ async def get_messages(
         )
     )
     conversation = conversation.scalar_one_or_none()
-
     if not conversation:
         raise HTTPException(status_code=404, detail="Conversation Not Found")
 
@@ -55,6 +61,7 @@ async def get_messages(
 
 class message_request_schema(BaseModel):
     message: str
+    model: str = DEFAULT_MODEL
 
 
 @router.post("/", response_model=message_response_schema)
@@ -71,7 +78,6 @@ async def post_message(
         )
     )
     conversation = conversation.scalar_one_or_none()
-
     if not conversation:
         raise HTTPException(status_code=404, detail="Conversation Not Found")
 
@@ -86,7 +92,9 @@ async def post_message(
     ai_response = await get_ai_response(
         user_message=message_request.message,
         conversation_id=conversation_id,
-        messages=messages
+        messages=messages,
+        model=message_request.model,
+        provider=derive_provider(message_request.model),
     )
 
     db.add(MessageModel(conversation_id=conversation_id, role="user", content=message_request.message))
@@ -157,7 +165,9 @@ Respond in 2-3 conversational sentences acknowledging the document and letting t
         ai_response = await get_ai_response(
             user_message=document_prompt,
             conversation_id=conversation_id,
-            messages=messages
+            messages=messages,
+            model=DEFAULT_MODEL,
+            provider=derive_provider(DEFAULT_MODEL),
         )
 
         db2.add(MessageModel(conversation_id=conversation_id, role="system", content=f"{FILE_EVENT_PREFIX}doc:{file.filename}"))
@@ -219,7 +229,9 @@ Respond in 2-4 conversational sentences naturally referencing 1-2 notable elemen
     ai_response = await get_ai_response(
         user_message=image_prompt,
         conversation_id=conversation_id,
-        messages=messages
+        messages=messages,
+        model=DEFAULT_MODEL,
+        provider=derive_provider(DEFAULT_MODEL),
     )
 
     db.add(MessageModel(conversation_id=conversation_id, role="system", content=f"{FILE_EVENT_PREFIX}img:{file.filename}"))

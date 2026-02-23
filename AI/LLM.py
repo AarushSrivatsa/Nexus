@@ -7,8 +7,6 @@ from AI.tools import universal_tools
 
 from database.models import MessageModel
 
-llm = ChatGroq(model="moonshotai/kimi-k2-instruct-0905", temperature=0.2)
-
 system_prompt = SystemMessage(
     content= """
 # IDENTITY
@@ -100,10 +98,14 @@ When multiple tools are needed, plan the sequence before calling any of them.
 async def get_ai_response(
     user_message: str,
     conversation_id: UUID,
-    messages: list
+    messages: list,
+    provider: str,
+    model: str,
+
 ) -> str:
     """Get AI response with tools"""
-
+    if provider=="groq":
+        llm = ChatGroq(model=model, temperature=0.2)
     chat_history = db_to_langchain(messages=messages)
     query = make_query_rag_tool(conversation_id=conversation_id)
     all_tools = universal_tools + [query]

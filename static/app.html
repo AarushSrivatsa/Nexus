@@ -224,12 +224,13 @@ body::before{
 /* INPUT */
 .input-area{padding:6px 11% 12px;flex-shrink:0;}
 .input-wrap{
-  display:flex;align-items:flex-end;gap:8px;
+  display:flex;flex-direction:column;
   background:var(--s1);border:1px solid var(--b2);
   border-radius:14px;padding:6px 6px 6px 16px;
   transition:border-color .25s,box-shadow .25s;
 }
 .input-wrap:focus-within{border-color:var(--a)44;box-shadow:0 0 0 3px var(--adim);}
+.input-row{display:flex;align-items:flex-end;gap:8px;}
 #msg-input{
   flex:1;border:none;background:none;
   font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--t1);
@@ -253,6 +254,41 @@ body::before{
 .send-ib:hover{opacity:.88;box-shadow:0 4px 22px #00e5ff44;}
 .send-ib:active{transform:scale(.9);}
 .send-ib:disabled{opacity:.18;cursor:not-allowed;box-shadow:none;}
+
+/* MODEL BAR */
+.model-bar{
+  display:flex;align-items:center;gap:5px;
+  padding:7px 0 2px;
+  border-top:1px solid var(--b1);
+  margin-top:5px;
+  overflow-x:auto;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+}
+.model-bar::-webkit-scrollbar{display:none;}
+.model-bar-label{
+  font-family:'Space Grotesk',sans-serif;font-size:9px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--t3);
+  flex-shrink:0;margin-right:2px;
+}
+.model-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 11px;border-radius:100px;
+  border:1px solid var(--b1);background:none;
+  font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;
+  color:var(--t3);cursor:pointer;white-space:nowrap;letter-spacing:.04em;
+  transition:all .18s var(--ease2);flex-shrink:0;
+}
+.model-chip:hover{border-color:var(--b2);color:var(--t2);background:var(--s2);}
+.model-chip.active{
+  border-color:var(--a)55;color:var(--a);
+  background:var(--adim);
+}
+.model-chip-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--t3);transition:background .18s;flex-shrink:0;
+}
+.model-chip.active .model-chip-dot{background:var(--a);}
 
 /* MODALS */
 .modal-bg{
@@ -397,7 +433,6 @@ body::before{
         <div class="fg"><label>Verification code</label>
           <div class="otp-row">
             <input type="text" id="s-otp" placeholder="000000" maxlength="6" onkeydown="if(event.key==='Enter')handleSignup()">
-            <!-- FIX: resendOTP no longer incorrectly reads the password field -->
             <button class="otp-resend" id="s-resend-btn" onclick="resendOTP()" disabled>Resend <span id="s-timer"></span></button>
           </div>
         </div>
@@ -481,21 +516,27 @@ body::before{
   </div>
   <div class="input-area">
     <div class="input-wrap">
-      <textarea id="msg-input" placeholder="Message Nexus…" rows="1" onkeydown="handleKey(event)" oninput="resize(this)"></textarea>
-      <div class="input-btns">
-        <button class="ib" onclick="openUpload()" title="Attach">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-        </button>
-        <button class="send-ib" id="send-btn" onclick="sendMessage()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        </button>
+      <!-- textarea + action buttons row -->
+      <div class="input-row">
+        <textarea id="msg-input" placeholder="Message Nexus…" rows="1" onkeydown="handleKey(event)" oninput="resize(this)"></textarea>
+        <div class="input-btns">
+          <button class="ib" onclick="openUpload()" title="Attach">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+          </button>
+          <button class="send-ib" id="send-btn" onclick="sendMessage()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>
+      <!-- model chip bar -->
+      <div class="model-bar" id="model-bar">
+        <span class="model-bar-label">Model</span>
       </div>
     </div>
   </div>
 </div>
 
 <!-- NEW CHAT MODAL -->
-<!-- FIX: clicking backdrop closes modal -->
 <div class="modal-bg" id="new-chat-modal" onclick="handleModalBgClick(event,'new-chat-modal')">
   <div class="modal-box" style="max-width:360px">
     <div class="modal-title">New conversation</div>
@@ -512,7 +553,6 @@ body::before{
 </div>
 
 <!-- UPLOAD MODAL -->
-<!-- FIX: clicking backdrop closes modal -->
 <div class="modal-bg" id="upload-modal" onclick="handleModalBgClick(event,'upload-modal')">
   <div class="modal-box">
     <div class="modal-title">Attach file</div>
@@ -543,10 +583,18 @@ body::before{
 <script>
 const API = '';
 const FILE_PREFIX = "024b4faf-5861-4f6b-840c-8f9b4cb660b1_";
+const DEFAULT_MODEL = "groq/compound-beta";
+
+// Models to hide from the chat UI (audio/speech, not LLMs)
+const HIDDEN_MODELS = new Set([
+  'whisper-large-v3',
+  'whisper-large-v3-turbo',
+  'canopylabs/orpheus-v1-english'
+]);
 
 let token = localStorage.getItem('at') || null;
 let rtoken = localStorage.getItem('rt') || null;
-let convId = null; // always stored as the raw value from the API (number or string)
+let convId = null;
 let upType = 'doc';
 let selFile = null;
 let signupStep = 'send';
@@ -555,12 +603,62 @@ let signupEmail = null;
 let busy = false;
 let otpTimer = null;
 let convMap = {};
+let selectedModel = localStorage.getItem('selectedModel') || DEFAULT_MODEL;
+let availableModels = [];
+
+// ── MODEL SELECTOR ────────────────────────────────────────────────────────────
+
+async function loadModels() {
+  try {
+    const r = await fetch(API + '/api/v1/models/get_models');
+    if (!r.ok) throw new Error('non-ok');
+    availableModels = await r.json();
+  } catch(e) {
+    // Fallback so bar is never empty
+    availableModels = [{id: DEFAULT_MODEL, name: 'Compound'}];
+  }
+  const chatModels = availableModels.filter(m => !HIDDEN_MODELS.has(m.id));
+  renderModelBar(chatModels);
+}
+
+function renderModelBar(models) {
+  const bar = document.getElementById('model-bar');
+  // Remove any existing chips (keep the label)
+  bar.querySelectorAll('.model-chip').forEach(el => el.remove());
+
+  // Validate selectedModel is in this list
+  if (!models.find(m => m.id === selectedModel)) {
+    selectedModel = models[0]?.id || DEFAULT_MODEL;
+    localStorage.setItem('selectedModel', selectedModel);
+  }
+
+  models.forEach(m => {
+    const btn = document.createElement('button');
+    btn.className = 'model-chip' + (m.id === selectedModel ? ' active' : '');
+    btn.dataset.id = m.id;
+    btn.innerHTML = '<span class="model-chip-dot"></span>' + esc(m.name);
+    btn.addEventListener('click', () => selectModel(m.id));
+    bar.appendChild(btn);
+  });
+}
+
+function selectModel(id) {
+  selectedModel = id;
+  localStorage.setItem('selectedModel', id);
+  document.querySelectorAll('.model-chip').forEach(el => {
+    el.classList.toggle('active', el.dataset.id === id);
+  });
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
 
 window.onload = async () => {
+  await loadModels();
   if (token) { showApp(); await loadConvs(); }
 };
 
-// FIX: close modal only when clicking the dark backdrop, not the box itself
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+
 function handleModalBgClick(event, modalId) {
   if (event.target === document.getElementById(modalId)) closeModal(modalId);
 }
@@ -658,11 +756,9 @@ async function handleSignup() {
   }
 }
 
-// FIX: was incorrectly reading v('s-pass') (password field) instead of using stored signupEmail/password
 async function resendOTP() {
   if (!signupEmail) { toast('No email on record, go back and try again'); return; }
   try {
-    // Re-use the password from the field (still visible in step-email area via DOM, but safer to re-read)
     const password = document.getElementById('s-pass').value;
     await apiPost('/api/v1/authentication/signup/send-otp', {email: signupEmail, password});
     startOtpTimer(); toast('OTP resent');
@@ -717,7 +813,11 @@ async function af(url, opts={}) {
 }
 
 function handleLogout() {
-  token = null; rtoken = null; localStorage.clear(); convId = null; convMap = {};
+  token = null; rtoken = null;
+  const savedModel = selectedModel; // preserve across logout
+  localStorage.clear();
+  localStorage.setItem('selectedModel', savedModel);
+  convId = null; convMap = {};
   document.getElementById('auth-overlay').classList.remove('hidden');
   document.getElementById('sb-list').innerHTML = '';
   document.getElementById('topbar-title').textContent = 'Select a conversation';
@@ -727,6 +827,8 @@ function handleLogout() {
 function showApp() {
   document.getElementById('auth-overlay').classList.add('hidden');
 }
+
+// ── CONVERSATIONS ─────────────────────────────────────────────────────────────
 
 async function loadConvs() {
   const r = await af('/api/v1/conversations/');
@@ -749,7 +851,6 @@ async function loadConvs() {
   });
 
   const order = ['Today','This week','This month','Older'];
-  // FIX: use data-id attribute + JS event delegation to avoid any title-escaping issues in onclick
   list.innerHTML = order.filter(k => grouped[k]).map(k =>
     '<div class="sb-section">'+k+'</div>' +
     grouped[k].map(c =>
@@ -762,7 +863,6 @@ async function loadConvs() {
     ).join('')
   ).join('');
 
-  // FIX: use event delegation for clicks so title text is irrelevant to selection
   list.querySelectorAll('.sb-item[data-id]').forEach(el => {
     el.addEventListener('click', () => selConvById(el.dataset.id));
   });
@@ -790,7 +890,6 @@ async function confirmNewChat() {
   selConvById(String(c.id));
 }
 
-// FIX: accepts string or number ID, always looks up from convMap
 function selConvById(id) {
   const key = Object.keys(convMap).find(k => String(k) === String(id));
   if (!key) { toast('Conversation not found'); return; }
@@ -798,18 +897,16 @@ function selConvById(id) {
   selConv(c.id, c.title);
 }
 
-// FIX: load convs first so sidebar updates active state, then load messages
 async function selConv(id, title) {
   convId = id;
   document.getElementById('topbar-title').textContent = title;
-  await loadConvs();       // sidebar re-renders with correct active item
-  await loadMsgs(id);      // then load messages
+  await loadConvs();
+  await loadMsgs(id);
 }
 
 async function delConv(id) {
   const r = await af('/api/v1/conversations/'+id, {method:'DELETE'});
   if (!r || !r.ok) { toast('Failed to delete'); return; }
-  // FIX: loose comparison to handle number vs string mismatch
   if (String(convId) === String(id)) {
     convId = null;
     document.getElementById('topbar-title').textContent = 'Select a conversation';
@@ -818,6 +915,8 @@ async function delConv(id) {
   await loadConvs();
   toast('Deleted');
 }
+
+// ── MESSAGES ──────────────────────────────────────────────────────────────────
 
 async function loadMsgs(id) {
   const r = await af('/api/v1/conversations/'+id+'/messages/');
@@ -828,7 +927,7 @@ async function loadMsgs(id) {
     return;
   }
   document.getElementById('messages').innerHTML = msgs.map(renderMsg).join('');
-  scrollBot(); // FIX: ensure we scroll after rendering
+  scrollBot();
 }
 
 function renderMsg(m) {
@@ -874,7 +973,6 @@ async function sendMessage() {
   busy = true;
   document.getElementById('send-btn').disabled = true;
   inp.value = '';
-  // FIX: properly reset textarea height after clearing
   inp.style.height = 'auto';
 
   const msgs = document.getElementById('messages');
@@ -888,9 +986,8 @@ async function sendMessage() {
     const r = await af('/api/v1/conversations/'+convId+'/messages/', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({message: text})
+      body: JSON.stringify({message: text, model: selectedModel})
     });
-    // FIX: check if response is ok BEFORE parsing to avoid consuming body on error
     if (!r || !r.ok) {
       let detail = 'Error sending message';
       try { const d = await r.json(); detail = d.detail || detail; } catch(_) {}
@@ -917,13 +1014,14 @@ function resize(el) {
   el.style.height = Math.min(el.scrollHeight, 160) + 'px';
 }
 
+// ── UPLOAD ────────────────────────────────────────────────────────────────────
+
 function openUpload() {
   if (!convId) { toast('Select a conversation first'); return; }
   selFile = null;
   upType = 'doc';
   document.getElementById('file-name').textContent = '';
   document.getElementById('file-input').value = '';
-  // FIX: reset tab UI state and file input accept attribute on every open
   document.querySelectorAll('.up-tab').forEach((b,i) => b.classList.toggle('on', i===0));
   document.getElementById('dz-icon').textContent = '📄';
   document.getElementById('dz-types').textContent = 'PDF, DOCX, TXT';
@@ -994,6 +1092,8 @@ async function doUpload() {
     toast(e.message || 'Upload failed');
   }
 }
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
 
 function v(id) { return document.getElementById(id).value.trim(); }
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
