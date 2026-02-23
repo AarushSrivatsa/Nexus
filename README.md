@@ -12,6 +12,7 @@ Nexus is a full-stack AI assistant backend that wraps a powerful LLM agent with:
 - **RAG (document memory)** — upload PDFs, DOCX, or TXT files; the AI can query them semantically using Pinecone vector search + reranking
 - **Vision** — upload images and the AI describes and reasons about them via Cloudflare Workers AI (LLaVA)
 - **Live web access** — agent can search, crawl, extract, and map websites in real-time via Tavily
+- **Model selector** — switch between any available Groq model per message from the chat UI
 - **Auth** — email/password signup with OTP verification, JWT access tokens, rotating refresh tokens, password reset flow
 
 ---
@@ -21,7 +22,7 @@ Nexus is a full-stack AI assistant backend that wraps a powerful LLM agent with:
 | Layer | Tech |
 |---|---|
 | Framework | FastAPI (async) |
-| LLM | Kimi K2 via Groq (`moonshotai/kimi-k2-instruct-0905`) |
+| LLM | Groq (multi-model — Compound Beta default) |
 | Agent | LangChain |
 | Vector DB | Pinecone |
 | Embeddings | Ollama (`nomic-embed-text:v1.5`) |
@@ -46,7 +47,8 @@ Nexus is a full-stack AI assistant backend that wraps a powerful LLM agent with:
 ├── routers/
 │   ├── authentication.py    # Signup, login, OTP, refresh, password reset
 │   ├── conversations.py     # Create, list, delete conversations
-│   └── messages.py          # Send messages, upload docs, upload images
+│   ├── messages.py          # Send messages, upload docs, upload images
+│   └── models.py            # GET /api/v1/models/get_models — available model list
 ├── AI/
 │   ├── LLM.py               # Agent setup, get_ai_response()
 │   ├── RAG.py               # Pinecone ingestion + query tool
@@ -56,7 +58,7 @@ Nexus is a full-stack AI assistant backend that wraps a powerful LLM agent with:
 │   ├── passwords.py         # Argon2 hash + verify
 │   └── tokens.py            # JWT create + verify, refresh token management
 └── utilities/
-    ├── email.py             # Brevo OTP email sender
+    ├── email.py             # Brevo OTP email sender (Nexus-styled HTML template)
     └── scheduled_tasks.py   # Cleanup jobs (expired OTPs)
 ```
 
@@ -140,11 +142,17 @@ The frontend is served at `http://localhost:8000/`.
 | Method | Endpoint | Description |
 |---|---|---|
 | `GET` | `/` | Get all messages in a conversation |
-| `POST` | `/` | Send a message, get AI response |
+| `POST` | `/` | Send a message (with optional `model` field), get AI response |
 | `POST` | `/documents` | Upload PDF/DOCX/TXT, adds to RAG |
 | `POST` | `/image` | Upload image, AI describes and responds |
 
-All endpoints except auth require a Bearer token in the `Authorization` header.
+### Models — `/api/v1/models`
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/get_models` | Returns list of available chat models |
+
+All endpoints except auth and `/get_models` require a Bearer token in the `Authorization` header.
 
 ---
 
@@ -165,6 +173,14 @@ The agent follows a priority order: time-sensitive → RAG → web → own knowl
 
 ---
 
+## Model selector
+
+The frontend fetches available models from `/api/v1/models/get_models` on load and renders them as chips in the input bar. The selected model is passed as a `model` field in every message request and persists in `localStorage` across sessions.
+
+To add or remove models, edit the `MODELS` list in `routers/models.py` — no frontend changes needed. Audio/speech models (Whisper, Orpheus) are automatically hidden from the chat UI since they require dedicated endpoints.
+
+---
+
 ## Auth flow
 
 ```
@@ -175,6 +191,8 @@ Reset:    email → OTP email → verify OTP + new password → all sessions rev
 ```
 
 Refresh tokens are stored hashed in the DB and rotated on every use. Password reset revokes all existing refresh tokens across all devices.
+
+OTP emails use a custom Nexus-styled HTML template matching the app's dark theme.
 
 ---
 
