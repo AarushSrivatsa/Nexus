@@ -52,31 +52,32 @@ You are Nexus — a sharp, fast AI with web access and document memory. Not a ge
 """
 )
 
+from fastapi import HTTPException
+
 async def get_ai_response(
     user_message: str,
     conversation_id: UUID,
     messages: list,
     provider: str,
     model: str,
-
 ) -> str:
-    """Get AI response with tools"""
-    if provider=="groq":
+    if provider == "groq":
         llm = ChatGroq(model=model, temperature=0.2)
+
     chat_history = db_to_langchain(messages=messages)
     query = make_query_rag_tool(conversation_id=conversation_id)
     all_tools = universal_tools + [query]
     agent = create_agent(model=llm, tools=all_tools)
-    full_history = [system_prompt] + chat_history + [HumanMessage(content=user_message)]  
+    full_history = [system_prompt] + chat_history + [HumanMessage(content=user_message)]
+
     try:
         response = await agent.ainvoke({"messages": full_history}, config={
-        "recursion_limit": 10,
-        "return_intermediate_steps": True
-    })
-        ai_message_content = response["messages"][-1].content
-        return ai_message_content
+            "recursion_limit": 10,
+            "return_intermediate_steps": True
+        })
+        return response["messages"][-1].content
     except Exception as e:
-        return f"I encountered an error: {str(e)}"
+        raise HTTPException(status_code=500, detail=str(e))
     
 def db_to_langchain(messages: list[MessageModel]):
     chat_history = []
