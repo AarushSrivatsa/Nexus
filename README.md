@@ -177,7 +177,7 @@ The agent follows a priority order: time-sensitive → RAG → web → own knowl
 
 The frontend fetches available models from `/api/v1/models/get_models` on load and renders them as chips in the input bar. The selected model is passed as a `model` field in every message request and persists in `localStorage` across sessions.
 
-To add or remove models, edit the `MODELS` list in `routers/models.py` — no frontend changes needed. Audio/speech models (Whisper, Orpheus) are automatically hidden from the chat UI since they require dedicated endpoints.
+To add or remove models, edit the `MODELS` list in `routers/models.py` — no frontend changes needed.
 
 ---
 
