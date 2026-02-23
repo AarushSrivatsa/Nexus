@@ -856,7 +856,7 @@ async function loadConvs() {
     grouped[k].map(c =>
       '<div class="sb-item'+(String(c.id)===String(convId)?' active':'')+'" data-id="'+c.id+'">' +
         '<span class="sb-item-title">'+esc(c.title)+'</span>' +
-        '<button class="sb-del" data-del="'+c.id+'" onclick="event.stopPropagation();delConv('+Number(c.id)+')" title="Delete">' +
+        '<button class="sb-del" data-del="'+c.id+'" onclick="event.stopPropagation();delConv(\''+c.id+'\')" title="Delete">' +
           '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
         '</button>' +
       '</div>'
