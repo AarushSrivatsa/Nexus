@@ -51,9 +51,6 @@ async def get_user_from_access_token(
 
     try: 
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        # Remove this check - you're not adding "type" to token
-        # if payload.get("type") != "access":
-        #     raise HTTPException(status_code=401, detail="Invalid token type")
         user_id = UUID(payload["sub"])  # Convert string to UUID
 
     except Exception:  # Catch all exceptions

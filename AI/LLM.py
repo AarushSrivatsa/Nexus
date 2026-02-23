@@ -4,7 +4,7 @@ from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from uuid import UUID
 from AI.RAG import make_query_rag_tool
 from AI.tools import universal_tools
-
+from fastapi import HTTPException
 from database.models import MessageModel
 
 system_prompt = SystemMessage(
@@ -51,8 +51,6 @@ You are Nexus — a sharp, fast AI with web access and document memory. Not a ge
 
 """
 )
-
-from fastapi import HTTPException
 
 async def get_ai_response(
     user_message: str,

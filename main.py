@@ -11,7 +11,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from contextlib import asynccontextmanager
 from utilities.scheduled_tasks import delete_unnecessary_otps_in_db
-
+import os
 
 scheduler = AsyncIOScheduler()
 router_list = [authentication_router,conversation_router,message_router,model_router]
@@ -25,6 +25,8 @@ async def lifespan(app: FastAPI):
     yield
     scheduler.shutdown()
 
+DEBUG = os.getenv("DEBUG", "false").lower() == "true"
+
 app = FastAPI(
     title="Chatbot Wrapper Backend",
     description="""
@@ -32,9 +34,9 @@ Built by **Aarush Srivatsa**
 GitHub Docs Link: https://github.com/AarushSrivatsa/Chatbot-Wrapper-Project-Backend-OpenDocs
 Linkedin Profile: https://www.linkedin.com/in/aarushsrivatsa/
 """, lifespan=lifespan,     
-    docs_url=None,
-    redoc_url=None,
-    openapi_url=None)
+    docs_url="/docs" if DEBUG else None,
+    redoc_url="/redoc" if DEBUG else None,
+    openapi_url="/openapi.json" if DEBUG else None,)
 
 for router in router_list:
     app.include_router(router)

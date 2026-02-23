@@ -130,7 +130,7 @@ Each conversation has its own isolated document namespace.
 
     return query_rag
 
-def clear_rag(conversation_id: int) -> str:
+def clear_rag(conversation_id: UUID) -> str:
     """Delete all documents for a specific conversation."""
     namespace = str(conversation_id)
     index.delete(namespace=namespace, delete_all=True)

@@ -34,7 +34,7 @@ async def send_otp_route(
     if result.scalar_one_or_none():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered would you like to signup"
+            detail="Email already registered would you like to sign in"
         )
     result = await db.execute(
         select(OTPVerificationModel).where(
@@ -101,7 +101,7 @@ async def verify_otp_route(
     )
 
     db.add(new_user)
-    await db.commit()
+    await db.flush()
     await db.refresh(new_user)
     
     # Generate tokens for the new user
@@ -140,8 +140,8 @@ async def login_route(
             detail="email does not exist"
         )
     
-        # Verify password
-    if not verify_password(user.hashed_password, login_request.password):
+    # Verify password
+    if not verify_password(hashed_password=user.hashed_password,plain_password=login_request.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password"

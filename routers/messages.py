@@ -233,9 +233,11 @@ Respond in 2-4 conversational sentences naturally referencing 1-2 notable elemen
         model=DEFAULT_MODEL,
         provider=derive_provider(DEFAULT_MODEL),
     )
-
+    
+    db.add(MessageModel(conversation_id=conversation_id,role="user",content=f"[Uploaded image: {file.filename}]"))
     db.add(MessageModel(conversation_id=conversation_id, role="system", content=f"{FILE_EVENT_PREFIX}img:{file.filename}"))
     ai_message = MessageModel(conversation_id=conversation_id, role="assistant", content=ai_response)
+    
     db.add(ai_message)
     conversation.updated_at = datetime.now(timezone.utc)
 
