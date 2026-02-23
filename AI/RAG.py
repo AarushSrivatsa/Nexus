@@ -116,37 +116,16 @@ def make_query_rag_tool(conversation_id: UUID):
     @tool
     def query_rag(query: str) -> str:
         """
-            Search through documents that the user has uploaded to this conversation.
+Semantic search over user-uploaded documents (PDF, DOCX, TXT) for this conversation.
 
-            This tool queries a vector database containing chunked, embedded content 
-            from all files the user has uploaded (PDFs, DOCX, TXT). It performs 
-            semantic similarity search to find the most relevant passages for the 
-            given query, then reranks results for maximum relevance.
+Use when: user references uploaded content, asks you to summarize/analyze a file,
+or any question where uploads might be relevant — always before web search.
+Skip when: nothing uploaded, question is general knowledge, user explicitly wants web.
 
-            WHEN TO USE:
-            - User asks a question that could be answered by something they uploaded
-            - User references "the document", "the file", "what I shared", "the PDF" etc.
-            - User asks you to summarize, analyze, or extract info from uploaded content
-            - ANY question where uploaded documents might be relevant — check RAG first,
-            web search second
-
-            WHEN NOT TO USE:
-            - No documents have been uploaded in this conversation
-            - User is asking about general knowledge or current events unrelated to uploads
-            - User explicitly asks you to search the web
-
-            INPUT:
-            - query: A natural language search query. Be specific. 
-            Good: "what are the key findings in chapter 3"
-            Bad: "document"
-
-            OUTPUT:
-            - Relevant excerpts from uploaded documents, formatted as numbered chunks
-            - Returns "No relevant information found." if nothing matches
-            
-            NOTE: Each conversation has its own isolated document namespace. 
-            You only see documents uploaded to THIS conversation.
-        """
+query: be specific — "key findings in chapter 3" not "document"
+Returns: ranked excerpts, or "No relevant information found."
+Each conversation has its own isolated document namespace.
+"""
         return _rag_runtime(query)
 
     return query_rag
