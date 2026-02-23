@@ -478,11 +478,13 @@ button:focus:not(:focus-visible){outline:none;}
 #msg-input{
   flex:1;border:none;background:none;
   font-family:'DM Sans',sans-serif;
-  font-size:16px; /* MUST be 16px+ to prevent iOS auto-zoom */
+  font-size:16px;
   color:var(--t1);outline:none;resize:none;
   max-height:160px;line-height:1.6;padding:3px 0;
+  appearance:none;
   -webkit-appearance:none;
 }
+
 #msg-input::placeholder{color:var(--t3);}
 
 .input-btns{display:flex;gap:4px;align-items:center;flex-shrink:0;padding-bottom:2px;}
