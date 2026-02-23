@@ -36,10 +36,9 @@ body::before{
   position:fixed;inset:0;background:var(--bg);
   display:flex;align-items:center;justify-content:center;
   z-index:200;transition:opacity .5s var(--ease),visibility .5s;
-  overflow-y:auto;
 }
 #auth-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none;}
-.auth-wrap{width:100%;max-width:400px;padding:0 28px;margin:auto;}
+.auth-wrap{width:100%;max-width:400px;padding:0 28px;}
 .auth-logo{display:flex;align-items:center;gap:12px;margin-bottom:44px;}
 .auth-logo-mark{
   width:42px;height:42px;border-radius:13px;background:var(--ag);
@@ -111,54 +110,19 @@ body::before{
 .email-pill span{font-size:12px;color:var(--t2);font-weight:500;}
 .email-pill button{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;color:var(--a);background:none;border:none;cursor:pointer;}
 
-/* MOBILE RESPONSIVE */
-@media(max-width:680px){
-  :root{--sb:82vw;}
-  #sidebar{
-    position:fixed;top:0;left:0;height:100%;z-index:50;
-    transform:translateX(-100%);transition:transform .3s var(--ease);
-    box-shadow:none;
-  }
-  #sidebar.open{transform:translateX(0);box-shadow:4px 0 40px rgba(0,0,0,.6);}
-  #sb-overlay{display:block;}
-  #sb-overlay.open{opacity:1;pointer-events:all;}
-  #main{width:100%;}
-  .topbar{padding:0 14px;}
-  .topbar-title{font-size:12px;}
-  #messages{padding:20px 4% 16px;}
-  .msg-bubble{max-width:88%;font-size:13px;padding:10px 14px;}
-  .input-area{padding:4px 10px 10px;}
-  .modal-box{max-width:calc(100vw - 24px)!important;padding:22px 18px;border-radius:18px;margin:0 12px;}
-  .auth-wrap{padding:0 20px;}
-  .auth-logo{margin-bottom:32px;}
-  .auth-h{font-size:22px;}
-  #toast{bottom:18px;max-width:calc(100vw - 40px);white-space:normal;text-align:center;}
-  .sb-del{display:flex!important;}
-  .msg-bubble pre{font-size:11px;padding:10px 12px;}
-  .otp-row{flex-direction:column;}
-  .otp-resend{width:100%;justify-content:center;display:flex;}
-}
-
 /* SIDEBAR */
 #sb-overlay{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);
   z-index:49;opacity:0;pointer-events:none;
-  transition:opacity .3s var(--ease2);backdrop-filter:blur(4px);
+  transition:opacity .28s var(--ease2);backdrop-filter:blur(4px);
 }
-.topbar-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0;}
-.topbar-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
-.topbar-icon-btn{
-  width:34px;height:34px;border:1px solid var(--b1);border-radius:9px;
-  background:none;cursor:pointer;color:var(--t3);
-  display:none;align-items:center;justify-content:center;
-  transition:all .2s var(--ease2);flex-shrink:0;
-}
-.topbar-icon-btn:hover{border-color:var(--b2);color:var(--t2);background:var(--s2);}
-@media(max-width:680px){.topbar-icon-btn{display:flex;}}
+#sb-overlay.open{opacity:1;pointer-events:all;}
 
 #sidebar{
   width:var(--sb);background:var(--s1);border-right:1px solid var(--b1);
-  display:flex;flex-direction:column;flex-shrink:0;position:relative;z-index:1;
+  display:flex;flex-direction:column;flex-shrink:0;
+  position:relative;z-index:1;
+  transition:transform .3s var(--ease);
 }
 .sb-top{padding:16px 16px 14px;border-bottom:1px solid var(--b1);display:flex;align-items:center;}
 .sb-brand{display:flex;align-items:center;gap:10px;}
@@ -215,12 +179,21 @@ body::before{
 .sb-logout:hover{background:var(--danger)10;border-color:var(--danger)55;box-shadow:0 0 14px var(--danger)14;}
 
 /* MAIN */
-#main{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;z-index:1;}
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;z-index:1;min-width:0;}
 .topbar{
-  padding:0 24px;height:50px;border-bottom:1px solid var(--b1);
-  background:var(--s1);display:flex;align-items:center;flex-shrink:0;
+  padding:0 16px;height:50px;border-bottom:1px solid var(--b1);
+  background:var(--s1);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:10px;
 }
-.topbar-title{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:var(--t2);letter-spacing:.02em;}
+.topbar-title{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:var(--t2);letter-spacing:.02em;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tb-btn{
+  width:34px;height:34px;border:1px solid var(--b1);border-radius:9px;
+  background:none;cursor:pointer;color:var(--t3);
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s var(--ease2);flex-shrink:0;
+}
+.tb-btn:hover{border-color:var(--b2);color:var(--t2);background:var(--s2);}
+.tb-btn.desktop-hide{display:none;}
+@media(max-width:680px){.tb-btn.desktop-hide{display:flex;}.tb-btn.mobile-hide{display:none;}}
 
 /* MESSAGES */
 #messages{flex:1;overflow-y:auto;padding:32px 11% 20px;display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth;}
@@ -293,10 +266,9 @@ body::before{
 .input-row{display:flex;align-items:flex-end;gap:8px;}
 #msg-input{
   flex:1;border:none;background:none;
-  font-family:'DM Sans',sans-serif;font-size:16px;color:var(--t1);
+  font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--t1);
   outline:none;resize:none;max-height:160px;line-height:1.6;padding:2px 0;
 }
-@media(min-width:681px){#msg-input{font-size:13.5px;}}
 #msg-input::placeholder{color:var(--t3);}
 .input-btns{display:flex;gap:4px;align-items:center;flex-shrink:0;padding-bottom:0;}
 .ib{
@@ -420,11 +392,57 @@ body::before{
   padding:6px 16px;font-size:11px;color:var(--t3);
   display:flex;align-items:center;gap:7px;font-weight:600;
 }
+
+/* ── MOBILE ─────────────────────────────────────────────── */
+@media(max-width:680px){
+  :root{--sb:80vw;}
+
+  /* sidebar becomes a fixed drawer */
+  #sidebar{
+    position:fixed;top:0;left:0;height:100vh;
+    transform:translateX(-100%);
+    box-shadow:none;border-right:none;
+  }
+  #sidebar.open{
+    transform:translateX(0);
+    box-shadow:8px 0 40px rgba(0,0,0,.7);
+    border-right:1px solid var(--b1);
+  }
+  #sb-overlay{display:block;}
+
+  /* messages */
+  #messages{padding:16px 3% 12px;}
+  .msg-bubble{max-width:90%;font-size:13px;padding:10px 14px;}
+  .msg-bubble pre{font-size:11px;padding:10px 12px;}
+
+  /* input */
+  .input-area{padding:4px 8px 10px;}
+  #msg-input{font-size:16px;} /* prevents iOS auto-zoom */
+
+  /* modals full width */
+  .modal-box{
+    margin:0 10px;
+    max-width:calc(100vw - 20px)!important;
+    padding:22px 18px;
+    border-radius:18px;
+  }
+
+  /* auth scrollable on small phones */
+  .auth-wrap{padding:28px 20px;}
+
+  /* delete always visible on touch */
+  .sb-del{display:flex!important;}
+
+  /* OTP row stacks */
+  .otp-row{flex-direction:column;}
+  .otp-resend{justify-content:center;}
+
+  /* toast */
+  #toast{bottom:16px;max-width:calc(100vw - 48px);white-space:normal;text-align:center;line-height:1.5;}
+}
 </style>
 </head>
 <body>
-
-<div id="sb-overlay" onclick="closeSidebar()"></div>
 
 <!-- AUTH -->
 <div id="auth-overlay">
@@ -525,6 +543,8 @@ body::before{
   </div>
 </div>
 
+<div id="sb-overlay" onclick="closeSidebar()"></div>
+
 <!-- SIDEBAR -->
 <div id="sidebar">
   <div class="sb-top">
@@ -570,17 +590,13 @@ body::before{
 <!-- MAIN -->
 <div id="main">
   <div class="topbar">
-    <div class="topbar-left">
-      <button class="topbar-icon-btn" id="sb-toggle" onclick="toggleSidebar()" title="Menu">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-      </button>
-      <span class="topbar-title" id="topbar-title">Select a conversation</span>
-    </div>
-    <div class="topbar-right">
-      <button class="topbar-icon-btn" onclick="openNewChat()" title="New chat">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      </button>
-    </div>
+    <button class="tb-btn desktop-hide" onclick="openSidebar()" title="Menu">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="topbar-title" id="topbar-title">Select a conversation</span>
+    <button class="tb-btn desktop-hide" onclick="openNewChat()" title="New chat">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
   </div>
   <div id="messages">
     <div class="no-conv">
@@ -727,11 +743,9 @@ function selectModel(id) {
 
 // ── SIDEBAR MOBILE ────────────────────────────────────────────────────────────
 
-function toggleSidebar() {
-  const sb = document.getElementById('sidebar');
-  const ov = document.getElementById('sb-overlay');
-  const open = sb.classList.toggle('open');
-  ov.classList.toggle('open', open);
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sb-overlay').classList.add('open');
 }
 
 function closeSidebar() {
