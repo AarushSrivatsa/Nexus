@@ -45,4 +45,4 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
 async def serve_frontend():
-    return FileResponse("static/app.html")
+    return FileResponse("static/index.html")

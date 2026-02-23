@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#05080d">
+<title>Nexus</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- AUTH OVERLAY -->
+<div id="auth-overlay">
+  <div class="auth-wrap">
+    <div class="auth-logo">
+      <div class="auth-logo-mark">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <line x1="5" y1="12" x2="19" y2="12" stroke="#000" stroke-width="1.5" stroke-opacity="0.35"/>
+          <line x1="12" y1="5" x2="12" y2="19" stroke="#000" stroke-width="1.5" stroke-opacity="0.35"/>
+          <line x1="5" y1="12" x2="12" y2="5" stroke="#000" stroke-width="1.5" stroke-opacity="0.35"/>
+          <line x1="12" y1="5" x2="19" y2="12" stroke="#000" stroke-width="1.5" stroke-opacity="0.35"/>
+          <line x1="19" y1="12" x2="12" y2="19" stroke="#000" stroke-width="1.5" stroke-opacity="0.35"/>
+          <line x1="12" y1="19" x2="5" y2="12" stroke="#000" stroke-width="1.5" stroke-opacity="0.35"/>
+          <circle cx="5" cy="12" r="2" fill="#000"/>
+          <circle cx="19" cy="12" r="2" fill="#000"/>
+          <circle cx="12" cy="5" r="2" fill="#000"/>
+          <circle cx="12" cy="19" r="2" fill="#000"/>
+          <circle cx="12" cy="12" r="3" fill="#000"/>
+        </svg>
+      </div>
+      <div>
+        <span class="auth-logo-name">NEXUS</span>
+        <div class="auth-byline">by <a href="https://www.linkedin.com/in/aarushsrivatsa/" target="_blank" rel="noopener" class="auth-byline-link">Aarush Srivatsa</a></div>
+      </div>
+    </div>
+
+    <h1 class="auth-h" id="auth-heading">Welcome back</h1>
+    <p class="auth-sub" id="auth-subtext">Sign in to continue</p>
+
+    <div class="seg" role="tablist">
+      <button class="seg-btn on" onclick="switchTab('login')" role="tab" aria-selected="true">Sign in</button>
+      <button class="seg-btn" onclick="switchTab('signup')" role="tab" aria-selected="false">Sign up</button>
+      <button class="seg-btn" onclick="switchTab('reset')" role="tab" aria-selected="false">Reset</button>
+    </div>
+
+    <!-- Login Tab -->
+    <div id="tab-login" role="tabpanel">
+      <div class="fg">
+        <label for="l-email">Email</label>
+        <input type="email" id="l-email" placeholder="you@example.com" autocomplete="email" inputmode="email" onkeydown="if(event.key==='Enter')handleLogin()">
+      </div>
+      <div class="fg">
+        <label for="l-pass">Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')handleLogin()">
+          <button type="button" class="pw-eye" onclick="togglePw('l-pass',this)" aria-label="Show password">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <button class="btn-main" onclick="handleLogin()">Sign in →</button>
+      <div class="auth-err" id="l-err" role="alert" aria-live="polite"></div>
+    </div>
+
+    <!-- Signup Tab -->
+    <div id="tab-signup" style="display:none" role="tabpanel">
+      <div id="s-step-email">
+        <div class="fg">
+          <label for="s-email">Email</label>
+          <input type="email" id="s-email" placeholder="you@example.com" autocomplete="email" inputmode="email">
+        </div>
+        <div class="fg">
+          <label for="s-pass">Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="s-pass" placeholder="Min 8 characters" autocomplete="new-password">
+            <button type="button" class="pw-eye" onclick="togglePw('s-pass',this)" aria-label="Show password">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="fg">
+          <label for="s-pass2">Confirm Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="s-pass2" placeholder="Repeat password" autocomplete="new-password">
+            <button type="button" class="pw-eye" onclick="togglePw('s-pass2',this)" aria-label="Show password">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <button class="btn-main" onclick="handleSignup()">Send OTP →</button>
+        <div class="auth-err" id="s-err" role="alert" aria-live="polite"></div>
+      </div>
+
+      <div id="s-step-otp" style="display:none">
+        <div class="email-pill">
+          <span id="s-email-display"></span>
+          <button onclick="goBackToEmail()">Wrong email?</button>
+        </div>
+        <div class="fg">
+          <label for="s-otp">Verification code</label>
+          <div class="otp-row">
+            <input type="text" id="s-otp" placeholder="000000" maxlength="6" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" onkeydown="if(event.key==='Enter')handleSignup()">
+            <button class="otp-resend" id="s-resend-btn" onclick="resendOTP()" disabled>Resend <span id="s-timer"></span></button>
+          </div>
+        </div>
+        <button class="btn-main" onclick="handleSignup()">Verify →</button>
+        <div class="auth-err" id="s-err2" role="alert" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <!-- Reset Tab -->
+    <div id="tab-reset" style="display:none" role="tabpanel">
+      <div class="fg">
+        <label for="r-email">Email</label>
+        <input type="email" id="r-email" placeholder="you@example.com" autocomplete="email" inputmode="email">
+      </div>
+      <div class="fg" id="r-otp-group" style="display:none">
+        <label for="r-otp">OTP</label>
+        <input type="text" id="r-otp" placeholder="000000" maxlength="6" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+      </div>
+      <div class="fg" id="r-pass-group" style="display:none">
+        <label for="r-pass">New Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="r-pass" placeholder="Min 8 characters" autocomplete="new-password">
+          <button type="button" class="pw-eye" onclick="togglePw('r-pass',this)" aria-label="Show password">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="fg" id="r-pass2-group" style="display:none">
+        <label for="r-pass2">Confirm Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="r-pass2" placeholder="Repeat password" autocomplete="new-password">
+          <button type="button" class="pw-eye" onclick="togglePw('r-pass2',this)" aria-label="Show password">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <button class="btn-main" id="r-btn" onclick="handleReset()">Send OTP →</button>
+      <div class="auth-err" id="r-err" role="alert" aria-live="polite"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Sidebar overlay (mobile backdrop) -->
+<div id="sb-overlay" onclick="closeSidebar()" aria-hidden="true"></div>
+
+<!-- SIDEBAR -->
+<nav id="sidebar" aria-label="Conversations">
+  <div class="sb-top">
+    <div class="sb-brand">
+      <div class="sb-mark" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <circle cx="5" cy="12" r="2" fill="#000"/>
+          <circle cx="19" cy="12" r="2" fill="#000"/>
+          <circle cx="12" cy="5" r="2" fill="#000"/>
+          <circle cx="12" cy="19" r="2" fill="#000"/>
+          <line x1="5" y1="12" x2="19" y2="12" stroke="#000" stroke-width="1.5" stroke-opacity="0.4"/>
+          <line x1="12" y1="5" x2="12" y2="19" stroke="#000" stroke-width="1.5" stroke-opacity="0.4"/>
+          <line x1="5" y1="12" x2="12" y2="5" stroke="#000" stroke-width="1.5" stroke-opacity="0.4"/>
+          <line x1="12" y1="5" x2="19" y2="12" stroke="#000" stroke-width="1.5" stroke-opacity="0.4"/>
+          <line x1="19" y1="12" x2="12" y2="19" stroke="#000" stroke-width="1.5" stroke-opacity="0.4"/>
+          <line x1="12" y1="19" x2="5" y2="12" stroke="#000" stroke-width="1.5" stroke-opacity="0.4"/>
+          <circle cx="12" cy="12" r="2.5" fill="#000"/>
+        </svg>
+      </div>
+      <div class="sb-brand-text">
+        <span class="sb-name">NEXUS</span>
+        <span class="sb-byline">by <a href="https://www.linkedin.com/in/aarushsrivatsa/" target="_blank" rel="noopener" class="sb-byline-link">Aarush Srivatsa</a></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sb-new-wrap">
+    <button class="sb-new-btn" onclick="openNewChat()" aria-label="New conversation">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New conversation
+    </button>
+  </div>
+
+  <div class="sb-list" id="sb-list" role="list"></div>
+
+  <div class="sb-foot">
+    <button class="sb-logout" onclick="handleLogout()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign out
+    </button>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main id="main">
+  <div class="topbar">
+    <button class="tb-btn desktop-hide" onclick="openSidebar()" aria-label="Open menu">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="topbar-title" id="topbar-title">Select a conversation</span>
+    <button class="tb-btn desktop-hide" onclick="openNewChat()" aria-label="New conversation">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+  </div>
+
+  <div id="messages" role="log" aria-live="polite" aria-label="Conversation">
+    <div class="no-conv">
+      <div class="no-conv-glyph" aria-hidden="true">✦</div>
+      <div class="no-conv-text">Start a conversation</div>
+      <div class="empty-hint">Web search · Document memory · Vision</div>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <div class="input-wrap">
+      <div class="input-row">
+        <textarea
+          id="msg-input"
+          placeholder="Message Nexus…"
+          rows="1"
+          onkeydown="handleKey(event)"
+          oninput="resize(this)"
+          aria-label="Message input"
+          autocomplete="off"
+          autocorrect="on"
+          autocapitalize="sentences"
+          spellcheck="true"
+        ></textarea>
+        <div class="input-btns">
+          <button class="ib" onclick="openUpload()" title="Attach file" aria-label="Attach file">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+          </button>
+          <button class="send-ib" id="send-btn" onclick="sendMessage()" aria-label="Send message">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="model-bar" id="model-bar" role="group" aria-label="Model selection">
+        <span class="model-bar-label">Model</span>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- NEW CHAT MODAL -->
+<div class="modal-bg" id="new-chat-modal" role="dialog" aria-modal="true" aria-labelledby="new-chat-title" onclick="handleModalBgClick(event,'new-chat-modal')">
+  <div class="modal-box" style="max-width:360px">
+    <div class="modal-title" id="new-chat-title">New conversation</div>
+    <div class="modal-sub">Give it a name to get started</div>
+    <div class="fg" style="margin-bottom:0">
+      <label for="new-title">Title</label>
+      <input type="text" id="new-title" placeholder="e.g. Research, Coding, Ideas…" maxlength="60" autocomplete="off" onkeydown="if(event.key==='Enter')confirmNewChat()">
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" onclick="closeModal('new-chat-modal')">Cancel</button>
+      <button class="btn-act" onclick="confirmNewChat()">Create →</button>
+    </div>
+  </div>
+</div>
+
+<!-- UPLOAD MODAL -->
+<div class="modal-bg" id="upload-modal" role="dialog" aria-modal="true" aria-labelledby="upload-title" onclick="handleModalBgClick(event,'upload-modal')">
+  <div class="modal-box">
+    <div class="modal-title" id="upload-title">Attach file</div>
+    <div class="modal-sub">Upload a document or image to this conversation</div>
+    <div class="up-tabs" role="tablist">
+      <button class="up-tab on" onclick="switchUpTab('doc')" role="tab" aria-selected="true">Document</button>
+      <button class="up-tab" onclick="switchUpTab('img')" role="tab" aria-selected="false">Image</button>
+    </div>
+    <div class="dropzone" id="dropzone"
+      role="button"
+      tabindex="0"
+      aria-label="Click to browse files or drag and drop"
+      onclick="document.getElementById('file-input').click()"
+      onkeydown="if(event.key==='Enter'||event.key===' ')document.getElementById('file-input').click()"
+      ondragover="event.preventDefault();this.classList.add('drag')"
+      ondragleave="this.classList.remove('drag')"
+      ondrop="onDrop(event)">
+      <div class="dropzone-icon" id="dz-icon" aria-hidden="true">📄</div>
+      <div class="dropzone-text"><strong>Click to browse</strong> or drag &amp; drop<br><span id="dz-types">PDF, DOCX, TXT</span></div>
+    </div>
+    <input type="file" id="file-input" accept=".pdf,.docx,.txt" onchange="onFileSelect(event)" aria-hidden="true">
+    <div id="file-name" role="status" aria-live="polite"></div>
+    <div class="modal-foot">
+      <button class="btn-ghost" onclick="closeModal('upload-modal')">Cancel</button>
+      <button class="btn-act" onclick="doUpload()">Upload →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
