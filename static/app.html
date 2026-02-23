@@ -206,15 +206,30 @@ body::before{
   font-family:'JetBrains Mono',monospace;font-size:12px;
   background:var(--bg);border:1px solid var(--b2);
   padding:14px 16px;border-radius:10px;overflow-x:auto;
-  margin-top:10px;white-space:pre-wrap;line-height:1.6;color:var(--a);
+  margin:10px 0 4px;white-space:pre-wrap;line-height:1.6;color:var(--a);
 }
 .msg-row.user .msg-bubble pre{background:rgba(0,0,0,.2);border-color:rgba(0,0,0,.15);color:#000;}
-.msg-bubble .mh1{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;margin:14px 0 5px;color:var(--t1);}
-.msg-bubble .mh2{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;margin:12px 0 4px;color:var(--t1);}
-.msg-bubble .mh3{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;margin:10px 0 3px;color:var(--t1);}
-.msg-bubble .mli{padding:3px 0 3px 14px;border-left:2px solid var(--a)44;margin:3px 0;}
+.msg-bubble .mh1{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;margin:18px 0 6px;color:var(--t1);line-height:1.3;}
+.msg-bubble .mh2{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;margin:14px 0 5px;color:var(--t1);line-height:1.3;}
+.msg-bubble .mh3{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;margin:12px 0 4px;color:var(--t1);line-height:1.3;}
+.msg-bubble .mh1:first-child,.msg-bubble .mh2:first-child,.msg-bubble .mh3:first-child{margin-top:2px;}
+.msg-bubble p{margin:0 0 10px;line-height:1.75;}
+.msg-bubble p:last-child{margin-bottom:0;}
+.msg-bubble ul,.msg-bubble ol{margin:6px 0 10px;padding-left:0;list-style:none;}
+.msg-bubble ul:last-child,.msg-bubble ol:last-child{margin-bottom:0;}
+.msg-bubble li{padding:3px 0 3px 20px;position:relative;line-height:1.65;}
+.msg-bubble ul li::before{content:'•';position:absolute;left:6px;color:var(--a);font-size:14px;line-height:1.65;}
+.msg-bubble ol{counter-reset:ol-counter;}
+.msg-bubble ol li{counter-increment:ol-counter;}
+.msg-bubble ol li::before{content:counter(ol-counter)'.';position:absolute;left:0;color:var(--a);font-size:12px;font-family:'JetBrains Mono',monospace;font-weight:600;line-height:1.9;}
+.msg-bubble code{font-family:'JetBrains Mono',monospace;font-size:11.5px;background:var(--s3);padding:2px 6px;border-radius:5px;color:var(--a);border:1px solid var(--b2);}
+.msg-row.user .msg-bubble code{background:rgba(0,0,0,.15);color:#000;border-color:rgba(0,0,0,.1);}
+.msg-bubble hr{border:none;border-top:1px solid var(--b2);margin:12px 0;}
+.msg-bubble blockquote{border-left:3px solid var(--a)55;padding-left:12px;margin:8px 0;color:var(--t2);font-style:italic;}
 .msg-row.user .msg-bubble .mh1,.msg-row.user .msg-bubble .mh2,.msg-row.user .msg-bubble .mh3{color:#000;}
-.msg-row.user .msg-bubble .mli{border-left-color:rgba(0,0,0,.2);}
+.msg-row.user .msg-bubble ul li::before,.msg-row.user .msg-bubble ol li::before{color:rgba(0,0,0,.5);}
+.msg-row.user .msg-bubble blockquote{border-left-color:rgba(0,0,0,.2);color:rgba(0,0,0,.7);}
+.msg-row.user .msg-bubble hr{border-top-color:rgba(0,0,0,.15);}
 .typing{display:flex;gap:5px;align-items:center;padding:4px 2px;}
 .tdot{width:5px;height:5px;border-radius:50%;background:var(--t3);animation:tdot 1.4s infinite;}
 .tdot:nth-child(2){animation-delay:.18s;}
@@ -942,21 +957,87 @@ function renderMsg(m) {
 }
 
 function fmt(t) {
+  // 1. extract code blocks first to protect them
   const blocks = [];
-  t = t.replace(/```[\w]*\n?([\s\S]*?)```/g, (_, code) => {
-    blocks.push('<pre>'+esc(code.trim())+'</pre>');
-    return '%%B'+(blocks.length-1)+'%%';
+  t = t.replace(/```([\w]*)\n?([\s\S]*?)```/g, (_, lang, code) => {
+    blocks.push('<pre><code>'+ esc(code.trim()) +'</code></pre>');
+    return '\x00B'+(blocks.length-1)+'\x00';
   });
-  t = t.replace(/^### (.+)$/gm,'<div class="mh3">$1</div>');
-  t = t.replace(/^## (.+)$/gm, '<div class="mh2">$1</div>');
-  t = t.replace(/^# (.+)$/gm,  '<div class="mh1">$1</div>');
-  t = t.replace(/^[-*] (.+)$/gm,'<div class="mli">$1</div>');
-  t = t.replace(/^\d+\. (.+)$/gm,'<div style="padding:2px 0 2px 4px">$1</div>');
-  t = t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
-  t = t.replace(/\*(.+?)\*/g,'<em>$1</em>');
-  t = t.replace(/\[(.+?)\]\((.+?)\)/g,'<a href="$2" target="_blank" rel="noopener" style="color:var(--a);text-decoration:underline">$1</a>');
-  t = t.replace(/\n/g,'<br>');
-  t = t.replace(/%%B(\d+)%%/g,(_,i) => blocks[i]);
+
+  // 2. inline code
+  t = t.replace(/`([^`]+)`/g, (_, c) => '<code>'+esc(c)+'</code>');
+
+  // 3. split into lines and process block-level elements
+  const lines = t.split('\n');
+  const out = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+
+    // headings
+    if (/^### (.+)/.test(line)) { out.push('<div class="mh3">'+inlineFmt(line.slice(4))+'</div>'); i++; continue; }
+    if (/^## (.+)/.test(line))  { out.push('<div class="mh2">'+inlineFmt(line.slice(3))+'</div>'); i++; continue; }
+    if (/^# (.+)/.test(line))   { out.push('<div class="mh1">'+inlineFmt(line.slice(2))+'</div>'); i++; continue; }
+
+    // horizontal rule
+    if (/^---+$/.test(line.trim())) { out.push('<hr>'); i++; continue; }
+
+    // blockquote
+    if (/^> (.+)/.test(line)) { out.push('<blockquote>'+inlineFmt(line.slice(2))+'</blockquote>'); i++; continue; }
+
+    // unordered list — collect consecutive items
+    if (/^[-*] (.+)/.test(line)) {
+      const items = [];
+      while (i < lines.length && /^[-*] (.+)/.test(lines[i])) {
+        items.push('<li>'+inlineFmt(lines[i].replace(/^[-*] /,''))+'</li>');
+        i++;
+      }
+      out.push('<ul>'+items.join('')+'</ul>');
+      continue;
+    }
+
+    // ordered list — collect consecutive items
+    if (/^\d+\. (.+)/.test(line)) {
+      const items = [];
+      while (i < lines.length && /^\d+\. (.+)/.test(lines[i])) {
+        items.push('<li>'+inlineFmt(lines[i].replace(/^\d+\. /,''))+'</li>');
+        i++;
+      }
+      out.push('<ol>'+items.join('')+'</ol>');
+      continue;
+    }
+
+    // blank line — paragraph break, skip
+    if (line.trim() === '') {
+      // only add spacing if there's meaningful content before and after
+      if (out.length > 0) out.push('__BLANK__');
+      i++; continue;
+    }
+
+    // collect consecutive normal lines into a paragraph
+    const paraLines = [];
+    while (i < lines.length && lines[i].trim() !== '' && !/^(#{1,3} |[-*] |\d+\. |> |---+|\x00B)/.test(lines[i])) {
+      paraLines.push(inlineFmt(lines[i]));
+      i++;
+    }
+    if (paraLines.length) out.push('<p>'+paraLines.join(' ')+'</p>');
+  }
+
+  // collapse consecutive blanks, use them as paragraph spacing
+  let html = out.join('').replace(/(__BLANK__)+/g, '');
+
+  // 4. restore code blocks
+  html = html.replace(/\x00B(\d+)\x00/g, (_, idx) => blocks[idx]);
+
+  return html;
+}
+
+function inlineFmt(t) {
+  t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  t = t.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  t = t.replace(/~~(.+?)~~/g, '<s>$1</s>');
+  t = t.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" rel="noopener" style="color:var(--a);text-decoration:underline">$1</a>');
   return t;
 }
 

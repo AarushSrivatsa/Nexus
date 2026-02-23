@@ -31,6 +31,9 @@ class ConvoModel(Base):
         onupdate=func.now())
     user = relationship("UserModel", back_populates="convos")
     messages = relationship("MessageModel", back_populates="convo")
+    __table_args__ = (
+        Index('ix_conversations_user_id', 'user_id'),
+    )
 
 class MessageModel(Base):
     __tablename__ = "messages"
