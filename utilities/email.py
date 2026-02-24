@@ -145,7 +145,6 @@ def email_the_otp(email: str, otp: str):
     except Exception as e:
         print("Email error:", e)
 
-
 def send_otp(bg: BackgroundTasks, email: str):
     otp = generate_otp()
     bg.add_task(email_the_otp, email, otp)

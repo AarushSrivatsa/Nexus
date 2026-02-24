@@ -26,14 +26,12 @@ def derive_provider(model: str) -> str:
         return "google"
     return "groq"
 
-
 class message_response_schema(BaseModel):
     id: UUID
     role: str
     content: str
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
-
 
 @router.get("/", response_model=list[message_response_schema])
 async def get_messages(
@@ -58,11 +56,9 @@ async def get_messages(
     )
     return messages.scalars().all()
 
-
 class message_request_schema(BaseModel):
     message: str
     model: str = DEFAULT_MODEL
-
 
 @router.post("/", response_model=message_response_schema)
 async def post_message(
@@ -106,14 +102,12 @@ async def post_message(
     await db.refresh(ai_message)
     return ai_message
 
-
 class post_document_response_schema(BaseModel):
     id: UUID
     role: str
     content: str
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
-
 
 @router.post("/documents", response_model=post_document_response_schema)
 async def post_documents(
@@ -178,14 +172,12 @@ Respond in 2-3 conversational sentences acknowledging the document and letting t
 
     return ai_message
 
-
 class post_image_response_schema(BaseModel):
     id: UUID
     role: str
     content: str
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
-
 
 @router.post("/image", response_model=post_image_response_schema)
 async def post_image(

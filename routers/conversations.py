@@ -52,7 +52,7 @@ async def list_conversations(
 
 class delete_convo_response_schema(BaseModel):
     result : str
-    
+
 @router.delete("/{conversation_id}",response_model=delete_convo_response_schema)
 async def delete_conversation(
     conversation_id: UUID,
@@ -71,13 +71,12 @@ async def delete_conversation(
     await db.execute(
         delete(MessageModel).where(MessageModel.conversation_id == conversation_id)
     )
-    
+
     await db.delete(conversation)
     await db.commit()
     try:
         clear_rag(conversation_id)
     except Exception as e:
         print(f"Warning: Failed to clear RAG for conversation {conversation_id}: {e}")
-    
-    return {"result":"Conversation deleted"}
 
+    return {"result":"Conversation deleted"}

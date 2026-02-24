@@ -323,7 +323,3 @@ async def reset_password_route(
         "refresh_token": tokens["refresh_token"],
         "token_type": tokens["token_type"]
     }
-
-
-
-

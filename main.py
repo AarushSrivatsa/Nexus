@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -11,7 +12,6 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from contextlib import asynccontextmanager
 from utilities.scheduled_tasks import delete_unnecessary_otps_in_db
-import os
 
 scheduler = AsyncIOScheduler()
 router_list = [authentication_router,conversation_router,message_router,model_router]
@@ -33,10 +33,12 @@ app = FastAPI(
 Built by **Aarush Srivatsa**
 GitHub Docs Link: https://github.com/AarushSrivatsa/Chatbot-Wrapper-Project-Backend-OpenDocs
 Linkedin Profile: https://www.linkedin.com/in/aarushsrivatsa/
-""", lifespan=lifespan,     
+""", 
+    lifespan=lifespan,
     docs_url="/docs" if DEBUG else None,
     redoc_url="/redoc" if DEBUG else None,
-    openapi_url="/openapi.json" if DEBUG else None,)
+    openapi_url="/openapi.json" if DEBUG else None,
+    )
 
 for router in router_list:
     app.include_router(router)
