@@ -124,7 +124,7 @@ def email_the_otp(email: str, otp: str):
   </table>
 </body>
 </html>"""
-
+        
         response = requests.post(
             "https://api.brevo.com/v3/smtp/email",
             headers={
