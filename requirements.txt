@@ -15,3 +15,7 @@ requests
 langchain-ollama
 asyncpg
 pydantic[email]
+pinecone
+langchain-pinecone
+python-multipart
+apscheduler
