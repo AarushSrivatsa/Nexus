@@ -19,3 +19,4 @@ pinecone
 langchain-pinecone
 python-multipart
 apscheduler
+pypdf
