@@ -12,7 +12,7 @@ pydantic
 argon2-cffi
 python-jose
 requests
-langchain-ollama
+langchain-google-genai
 asyncpg
 pydantic[email]
 pinecone

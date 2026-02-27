@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from langchain_ollama import OllamaEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -16,7 +16,7 @@ ACCESS_TOKEN_EXPIRE_HOURS = 24
 REFRESH_TOKEN_EXPIRE_DAYS = 30
 
 INDEX_NAME = "nexus"
-EMBEDDING_MODEL = OllamaEmbeddings(model="nomic-embed-text:v1.5")
+EMBEDDING_MODEL = GoogleGenerativeAIEmbeddings(model="gemini-embedding-001")
 DIMENSIONS = 768
 CHUNK_SIZE = 400
 CHUNK_OVERLAP = 75
