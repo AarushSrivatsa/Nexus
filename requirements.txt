@@ -12,7 +12,6 @@ pydantic
 argon2-cffi
 python-jose
 requests
-langchain-google-genai
 asyncpg
 pydantic[email]
 pinecone
@@ -20,3 +19,4 @@ langchain-pinecone
 python-multipart
 apscheduler
 pypdf
+voyageai

@@ -3,7 +3,8 @@
 /* ── CONSTANTS ───────────────────────────────────────────── */
 const API          = '';
 const FILE_PREFIX  = '024b4faf-5861-4f6b-840c-8f9b4cb660b1_';
-const DEFAULT_MODEL = 'moonshotai/kimi-k2-instruct-0905';
+const DEFAULT_MODEL    = 'moonshotai/kimi-k2-instruct-0905';
+const DEFAULT_PROVIDER = 'groq';
 
 const HIDDEN_MODELS = new Set([
   'whisper-large-v3',
@@ -24,8 +25,9 @@ let busy         = false;
 let otpTimer     = null;
 let convMap      = {};
 let toastTimer   = null;
-let selectedModel = localStorage.getItem('nexus_model') || DEFAULT_MODEL;
-let availableModels = [];
+let selectedModel    = localStorage.getItem('nexus_model')    || DEFAULT_MODEL;
+let selectedProvider = localStorage.getItem('nexus_provider') || DEFAULT_PROVIDER;
+let availableModels  = [];
 
 /* ═══════════════════════════════════════════════════════════
    MODELS
@@ -36,7 +38,7 @@ async function loadModels() {
     if (!r.ok) throw 0;
     availableModels = await r.json();
   } catch {
-    availableModels = [{ id: DEFAULT_MODEL, name: 'Kimi K2' }];
+    availableModels = [{ id: DEFAULT_MODEL, name: 'Kimi K2', provider: DEFAULT_PROVIDER }];
   }
   renderModelBar(availableModels.filter(m => !HIDDEN_MODELS.has(m.id)));
 }
@@ -46,8 +48,10 @@ function renderModelBar(models) {
   bar.querySelectorAll('.model-chip').forEach(el => el.remove());
 
   if (!models.find(m => m.id === selectedModel)) {
-    selectedModel = models[0]?.id || DEFAULT_MODEL;
-    localStorage.setItem('nexus_model', selectedModel);
+    selectedModel    = models[0]?.id       || DEFAULT_MODEL;
+    selectedProvider = models[0]?.provider || DEFAULT_PROVIDER;
+    localStorage.setItem('nexus_model',    selectedModel);
+    localStorage.setItem('nexus_provider', selectedProvider);
   }
 
   models.forEach(m => {
@@ -63,8 +67,11 @@ function renderModelBar(models) {
 }
 
 function selectModel(id) {
-  selectedModel = id;
-  localStorage.setItem('nexus_model', id);
+  const model      = availableModels.find(m => m.id === id);
+  selectedModel    = id;
+  selectedProvider = model?.provider || DEFAULT_PROVIDER;
+  localStorage.setItem('nexus_model',    id);
+  localStorage.setItem('nexus_provider', selectedProvider);
   document.querySelectorAll('.model-chip').forEach(el => {
     const on = el.dataset.id === id;
     el.classList.toggle('active', on);
@@ -296,9 +303,11 @@ async function af(url, opts = {}) {
 
 function handleLogout() {
   token = null; rtoken = null;
-  const saved = selectedModel;
+  const savedModel    = selectedModel;
+  const savedProvider = selectedProvider;
   localStorage.clear();
-  localStorage.setItem('nexus_model', saved);
+  localStorage.setItem('nexus_model',    savedModel);
+  localStorage.setItem('nexus_provider', savedProvider);
   convId = null; convMap = {};
   closeSidebar();
   document.getElementById('auth-overlay').classList.remove('hidden');
@@ -512,26 +521,20 @@ function fmt(raw) {
 }
 
 function inlineFmt(t) {
-  /* bold+italic combo */
   t = t.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
   t = t.replace(/__(.+?)__/g,         '<strong>$1</strong>');
   t = t.replace(/\*\*(.+?)\*\*/g,     '<strong>$1</strong>');
   t = t.replace(/\*(.+?)\*/g,         '<em>$1</em>');
   t = t.replace(/_(.+?)_/g,           '<em>$1</em>');
   t = t.replace(/~~(.+?)~~/g,         '<s>$1</s>');
-
-  /* ── LINKS — clickable, open new tab ───────────────────── */
-  /* markdown links [text](url) */
   t = t.replace(
     /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
     '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
   );
-  /* bare URLs — not already inside an href */
   t = t.replace(
     /(^|[\s(,>])(https?:\/\/[^\s<)"']+)/g,
     '$1<a href="$2" target="_blank" rel="noopener noreferrer">$2</a>'
   );
-
   return t;
 }
 
@@ -577,7 +580,7 @@ async function sendMessage() {
     const r = await af('/api/v1/conversations/' + convId + '/messages/', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ message: text, model: selectedModel }),
+      body:    JSON.stringify({ message: text, model: selectedModel, provider: selectedProvider }),
     });
     if (!r || !r.ok) {
       let detail = 'Error sending message';

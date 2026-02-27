@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_core.embeddings import Embeddings
+import voyageai
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -9,15 +10,27 @@ PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 CF_API_TOKEN = os.getenv("CF_API_TOKEN")
 CF_ACCOUNT_ID = os.getenv("CF_ACCOUNT_ID")
-
+VOYAGE_API_KEY = os.getenv("VOYAGE_API_KEY")
 SECRET_KEY = os.getenv("SECRET_KEY", "change-this-secret-key-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_HOURS = 24
 REFRESH_TOKEN_EXPIRE_DAYS = 30
 
+class VoyageEmbeddings(Embeddings):
+    def __init__(self):
+        self.client = voyageai.Client(api_key=VOYAGE_API_KEY)
+
+    def embed_documents(self, texts):
+        result = self.client.embed(texts, model="voyage-3-lite")
+        return result.embeddings
+
+    def embed_query(self, text):
+        result = self.client.embed([text], model="voyage-3-lite")
+        return result.embeddings[0]
+    
 INDEX_NAME = "nexus"
-EMBEDDING_MODEL = GoogleGenerativeAIEmbeddings(model="gemini-embedding-001")
-DIMENSIONS = 768
+EMBEDDING_MODEL = VoyageEmbeddings()
+DIMENSIONS = 512
 CHUNK_SIZE = 400
 CHUNK_OVERLAP = 75
 SEPARATORS = ["\n\n", "\n", ".", ",", " ", ""]

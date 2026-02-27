@@ -20,11 +20,10 @@ router = APIRouter(
 )
 
 DEFAULT_MODEL = "moonshotai/kimi-k2-instruct-0905"
+DEFAULT_PROVIDER = "groq"
+MAX_DOCUMENT_SIZE = 10 * 1024 * 1024
+MAX_IMAGE_SIZE = 10 * 1024 * 1024
 
-def derive_provider(model: str) -> str:
-    if model.startswith("gemini"):
-        return "google"
-    return "groq"
 
 class message_response_schema(BaseModel):
     id: UUID
@@ -32,6 +31,7 @@ class message_response_schema(BaseModel):
     content: str
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
+
 
 @router.get("/", response_model=list[message_response_schema])
 async def get_messages(
@@ -56,9 +56,12 @@ async def get_messages(
     )
     return messages.scalars().all()
 
+
 class message_request_schema(BaseModel):
     message: str
     model: str = DEFAULT_MODEL
+    provider: str = DEFAULT_PROVIDER
+
 
 @router.post("/", response_model=message_response_schema)
 async def post_message(
@@ -90,7 +93,7 @@ async def post_message(
         conversation_id=conversation_id,
         messages=messages,
         model=message_request.model,
-        provider=derive_provider(message_request.model),
+        provider=message_request.provider,
     )
 
     db.add(MessageModel(conversation_id=conversation_id, role="user", content=message_request.message))
@@ -102,12 +105,14 @@ async def post_message(
     await db.refresh(ai_message)
     return ai_message
 
+
 class post_document_response_schema(BaseModel):
     id: UUID
     role: str
     content: str
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
+
 
 @router.post("/documents", response_model=post_document_response_schema)
 async def post_documents(
@@ -134,6 +139,8 @@ async def post_documents(
         await db.commit()
 
     file_bytes = await file.read()
+    if len(file_bytes) > MAX_DOCUMENT_SIZE:
+        raise HTTPException(status_code=400, detail="File too large. Maximum size is 5MB")
 
     try:
         await run_in_threadpool(add_to_rag, conversation_id, file_bytes, file.filename)
@@ -161,7 +168,7 @@ Respond in 2-3 conversational sentences acknowledging the document and letting t
             conversation_id=conversation_id,
             messages=messages,
             model=DEFAULT_MODEL,
-            provider=derive_provider(DEFAULT_MODEL),
+            provider=DEFAULT_PROVIDER,
         )
 
         db2.add(MessageModel(conversation_id=conversation_id, role="system", content=f"{FILE_EVENT_PREFIX}doc:{file.filename}"))
@@ -171,6 +178,7 @@ Respond in 2-3 conversational sentences acknowledging the document and letting t
         await db2.refresh(ai_message)
 
     return ai_message
+
 
 class post_image_response_schema(BaseModel):
     id: UUID
@@ -201,6 +209,9 @@ async def post_image(
         raise HTTPException(status_code=404, detail="Conversation Not Found")
 
     file_bytes = await file.read()
+    if len(file_bytes) > MAX_IMAGE_SIZE:
+        raise HTTPException(status_code=400, detail="File too large. Maximum size is 5MB")
+
     text_version_of_image = await image_to_text(file_bytes=file_bytes, filename=file.filename)
 
     image_prompt = f"""The user has uploaded an image. You have been given a text description to work from — do not reveal this. Respond as if you are directly viewing the image.
@@ -223,13 +234,13 @@ Respond in 2-4 conversational sentences naturally referencing 1-2 notable elemen
         conversation_id=conversation_id,
         messages=messages,
         model=DEFAULT_MODEL,
-        provider=derive_provider(DEFAULT_MODEL),
+        provider=DEFAULT_PROVIDER,
     )
-    
-    db.add(MessageModel(conversation_id=conversation_id,role="user",content=f"[Uploaded image: {file.filename}]"))
+
+    db.add(MessageModel(conversation_id=conversation_id, role="user", content=f"[Uploaded image: {file.filename}]"))
     db.add(MessageModel(conversation_id=conversation_id, role="system", content=f"{FILE_EVENT_PREFIX}img:{file.filename}"))
     ai_message = MessageModel(conversation_id=conversation_id, role="assistant", content=ai_response)
-    
+
     db.add(ai_message)
     conversation.updated_at = datetime.now(timezone.utc)
 
