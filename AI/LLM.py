@@ -75,6 +75,7 @@ async def get_ai_response(
         })
         return response["messages"][-1].content
     except Exception as e:
+        print(str(e))
         raise HTTPException(status_code=500, detail=str(e))
     
 def db_to_langchain(messages: list[MessageModel]):

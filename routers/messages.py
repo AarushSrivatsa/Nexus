@@ -24,14 +24,12 @@ DEFAULT_PROVIDER = "groq"
 MAX_DOCUMENT_SIZE = 10 * 1024 * 1024
 MAX_IMAGE_SIZE = 10 * 1024 * 1024
 
-
 class message_response_schema(BaseModel):
     id: UUID
     role: str
     content: str
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
-
 
 @router.get("/", response_model=list[message_response_schema])
 async def get_messages(

@@ -100,7 +100,6 @@ window.addEventListener('load', async () => {
   else { document.getElementById('l-email').focus(); }
 });
 
-// Escape key: close sidebar or topmost modal
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   const openModal = [...document.querySelectorAll('.modal-bg.open')].pop();
@@ -234,13 +233,13 @@ async function handleSignup() {
 }
 
 async function resendOTP() {
-  if (!signupEmail) { toast('No email on record — go back and try again'); return; }
+  if (!signupEmail) { toast('No email on record — go back and try again', true); return; }
   try {
     const password = document.getElementById('s-pass').value;
     await apiPost('/api/v1/authentication/signup/send-otp', { email: signupEmail, password });
     startOtpTimer();
     toast('OTP resent');
-  } catch(e) { toast('Failed to resend: ' + e.message); }
+  } catch(e) { toast('Failed to resend: ' + e.message, true); }
 }
 
 async function handleReset() {
@@ -288,7 +287,6 @@ async function doRefresh() {
   } catch { handleLogout(); return false; }
 }
 
-/* authenticated fetch — auto-refreshes on 401 */
 async function af(url, opts = {}) {
   if (!opts.headers) opts.headers = {};
   opts.headers['Authorization'] = 'Bearer ' + token;
@@ -371,14 +369,14 @@ function openNewChat() {
 
 async function confirmNewChat() {
   const title = document.getElementById('new-title').value.trim();
-  if (!title) { toast('Please enter a title'); return; }
+  if (!title) { toast('Please enter a title', true); return; }
   closeModal('new-chat-modal');
   const r = await af('/api/v1/conversations/', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ title }),
   });
-  if (!r || !r.ok) { toast('Failed to create conversation'); return; }
+  if (!r || !r.ok) { toast('Failed to create conversation', true); return; }
   const c = await r.json();
   convMap[c.id] = c;
   await loadConvs();
@@ -387,7 +385,7 @@ async function confirmNewChat() {
 
 function selConvById(id) {
   const c = convMap[Object.keys(convMap).find(k => String(k) === String(id))];
-  if (!c) { toast('Conversation not found'); return; }
+  if (!c) { toast('Conversation not found', true); return; }
   selConv(c.id, c.title);
 }
 
@@ -401,7 +399,7 @@ async function selConv(id, title) {
 
 async function delConv(id) {
   const r = await af('/api/v1/conversations/' + id, { method: 'DELETE' });
-  if (!r || !r.ok) { toast('Failed to delete'); return; }
+  if (!r || !r.ok) { toast('Failed to delete', true); return; }
   if (String(convId) === String(id)) {
     convId = null;
     document.getElementById('topbar-title').textContent = 'Select a conversation';
@@ -446,17 +444,14 @@ function renderMsg(m) {
    MARKDOWN → HTML
    ═══════════════════════════════════════════════════════════ */
 function fmt(raw) {
-  /* 1 — protect fenced code blocks */
   const blocks = [];
   let t = raw.replace(/```([\w-]*)\n?([\s\S]*?)```/g, (_, lang, code) => {
     blocks.push(`<pre><code>${esc(code.trim())}</code></pre>`);
     return '\x00B' + (blocks.length - 1) + '\x00';
   });
 
-  /* 2 — inline code */
   t = t.replace(/`([^`\n]+)`/g, (_, c) => `<code>${esc(c)}</code>`);
 
-  /* 3 — line-by-line parse */
   const lines = t.split('\n');
   const out   = [];
   let i = 0;
@@ -465,18 +460,14 @@ function fmt(raw) {
     const line    = lines[i];
     const trimmed = line.trim();
 
-    /* headings */
     if (/^### (.+)/.test(line)) { out.push(`<div class="mh3">${inlineFmt(line.slice(4))}</div>`); i++; continue; }
     if (/^## (.+)/.test(line))  { out.push(`<div class="mh2">${inlineFmt(line.slice(3))}</div>`); i++; continue; }
     if (/^# (.+)/.test(line))   { out.push(`<div class="mh1">${inlineFmt(line.slice(2))}</div>`); i++; continue; }
 
-    /* horizontal rule */
     if (/^---+$/.test(trimmed)) { out.push('<hr>'); i++; continue; }
 
-    /* blockquote */
     if (/^> (.+)/.test(line)) { out.push(`<blockquote>${inlineFmt(line.slice(2))}</blockquote>`); i++; continue; }
 
-    /* unordered list — collect consecutive */
     if (/^[-*+] /.test(line)) {
       const items = [];
       while (i < lines.length && /^[-*+] /.test(lines[i])) {
@@ -487,7 +478,6 @@ function fmt(raw) {
       continue;
     }
 
-    /* ordered list — collect consecutive */
     if (/^\d+\. /.test(line)) {
       const items = [];
       while (i < lines.length && /^\d+\. /.test(lines[i])) {
@@ -498,10 +488,8 @@ function fmt(raw) {
       continue;
     }
 
-    /* blank line — skip */
     if (trimmed === '') { i++; continue; }
 
-    /* paragraph — collect consecutive non-special lines */
     const para = [];
     while (
       i < lines.length &&
@@ -514,7 +502,6 @@ function fmt(raw) {
     if (para.length) out.push(`<p>${para.join(' ')}</p>`);
   }
 
-  /* 4 — restore code blocks */
   let html = out.join('');
   html = html.replace(/\x00B(\d+)\x00/g, (_, idx) => blocks[+idx]);
   return html;
@@ -547,7 +534,7 @@ function scrollBot() {
    SEND MESSAGE
    ═══════════════════════════════════════════════════════════ */
 async function sendMessage() {
-  if (!convId)   { toast('Select a conversation first'); return; }
+  if (!convId)   { toast('Select a conversation first', true); return; }
   const inp  = document.getElementById('msg-input');
   const text = inp.value.trim();
   if (!text || busy) return;
@@ -583,8 +570,8 @@ async function sendMessage() {
       body:    JSON.stringify({ message: text, model: selectedModel, provider: selectedProvider }),
     });
     if (!r || !r.ok) {
-      let detail = 'Error sending message';
-      try { const d = await r.json(); detail = d.detail || detail; } catch {}
+      let detail = 'Something went wrong';
+      try { const d = await r.json(); detail = d.detail || d.message || detail; } catch {}
       throw new Error(detail);
     }
     const d = await r.json();
@@ -593,7 +580,7 @@ async function sendMessage() {
     scrollBot();
   } catch(e) {
     document.getElementById('typing-row')?.remove();
-    toast(e.message || 'Failed to send');
+    toast(e.message || 'Failed to send', true);
   }
 
   busy = false;
@@ -601,7 +588,6 @@ async function sendMessage() {
   inp.focus();
 }
 
-/* Enter sends on desktop; on mobile Enter = newline */
 function handleKey(e) {
   const isMobile = window.matchMedia('(max-width:680px)').matches;
   if (e.key === 'Enter' && !e.shiftKey && !isMobile) {
@@ -619,7 +605,7 @@ function resize(el) {
    FILE UPLOAD
    ═══════════════════════════════════════════════════════════ */
 function openUpload() {
-  if (!convId) { toast('Select a conversation first'); return; }
+  if (!convId) { toast('Select a conversation first', true); return; }
   selFile  = null;
   upType   = 'doc';
   document.getElementById('file-name').textContent  = '';
@@ -666,8 +652,8 @@ function onDrop(e) {
 }
 
 async function doUpload() {
-  if (!selFile)  { toast('Select a file first'); return; }
-  if (!convId)   { toast('Select a conversation first'); closeModal('upload-modal'); return; }
+  if (!selFile)  { toast('Select a file first', true); return; }
+  if (!convId)   { toast('Select a conversation first', true); closeModal('upload-modal'); return; }
 
   const ep   = upType === 'img'
     ? '/api/v1/conversations/' + convId + '/messages/image'
@@ -697,7 +683,7 @@ async function doUpload() {
     document.getElementById('upload-typing')?.remove();
     if (!r || !r.ok) {
       let detail = 'Upload failed';
-      try { const d = await r.json(); detail = d.detail || detail; } catch {}
+      try { const d = await r.json(); detail = d.detail || d.message || detail; } catch {}
       throw new Error(detail);
     }
     await loadMsgs(convId);
@@ -705,7 +691,7 @@ async function doUpload() {
   } catch(e) {
     document.getElementById('upload-pending')?.remove();
     document.getElementById('upload-typing')?.remove();
-    toast(e.message || 'Upload failed');
+    toast(e.message || 'Upload failed', true);
   }
 }
 
@@ -725,12 +711,13 @@ function openModal(id) {
 }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-function toast(msg) {
+function toast(msg, isError = false) {
   const el = document.getElementById('toast');
   el.textContent = msg;
+  el.classList.toggle('toast-error', isError);
   el.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
 }
 
 function setLoading(btn, label) { btn.textContent = label; btn.disabled = true; }
@@ -752,7 +739,7 @@ async function apiPost(url, body) {
     body:    JSON.stringify(body),
   });
   const d = await r.json();
-  if (!r.ok) throw new Error(d.detail || 'Request failed');
+  if (!r.ok) throw new Error(d.detail || d.message || 'Request failed');
   return d;
 }
 
