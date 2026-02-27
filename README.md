@@ -9,10 +9,10 @@
 Nexus is a full-stack AI assistant backend that wraps a powerful LLM agent with:
 
 - **Persistent conversations** — multi-turn chat stored in PostgreSQL, per-user isolated
-- **RAG (document memory)** — upload PDFs, DOCX, or TXT files; the AI can query them semantically using Pinecone vector search + reranking
+- **RAG (document memory)** — upload PDFs, DOCX, or TXT files; the AI can query them semantically using Pinecone vector search
 - **Vision** — upload images and the AI describes and reasons about them via Cloudflare Workers AI (LLaVA)
 - **Live web access** — agent can search, crawl, extract, and map websites in real-time via Tavily
-- **Model selector** — switch between any available Groq model per message from the chat UI
+- **Model selector** — switch between any available model per message from the chat UI, provider is inferred automatically
 - **Auth** — email/password signup with OTP verification, JWT access tokens, rotating refresh tokens, password reset flow
 
 ---
@@ -22,10 +22,10 @@ Nexus is a full-stack AI assistant backend that wraps a powerful LLM agent with:
 | Layer | Tech |
 |---|---|
 | Framework | FastAPI (async) |
-| LLM | Groq (multi-model — Compound Beta default) |
+| LLM | Groq (multi-model — Kimi K2 default) |
 | Agent | LangChain |
 | Vector DB | Pinecone |
-| Embeddings | Ollama (`nomic-embed-text:v1.5`) |
+| Embeddings | Voyage AI (`voyage-3-lite`) |
 | Vision | Cloudflare Workers AI (LLaVA 1.5 7B) |
 | Web tools | Tavily (search, crawl, extract, map) |
 | Database | PostgreSQL + SQLAlchemy (async) |
@@ -76,13 +76,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Set up Ollama embeddings
-
-```bash
-ollama pull nomic-embed-text:v1.5
-```
-
-### 3. Configure environment variables
+### 2. Configure environment variables
 
 Create a `.env` file in the root:
 
@@ -92,6 +86,7 @@ SECRET_KEY=your-secret-key-here
 
 GROQ_API_KEY=your-groq-api-key
 PINECONE_API_KEY=your-pinecone-api-key
+VOYAGE_API_KEY=your-voyage-api-key
 TAVILY_API_KEY=your-tavily-api-key
 
 CF_ACCOUNT_ID=your-cloudflare-account-id
@@ -99,6 +94,12 @@ CF_API_TOKEN=your-cloudflare-workers-ai-token
 
 BREVO_API_KEY=your-brevo-api-key
 ```
+
+### 3. Create Pinecone index
+
+Create an index named `nexus` with:
+- **Dimensions:** 512
+- **Metric:** cosine
 
 ### 4. Create database tables
 
@@ -142,15 +143,15 @@ The frontend is served at `http://localhost:8000/`.
 | Method | Endpoint | Description |
 |---|---|---|
 | `GET` | `/` | Get all messages in a conversation |
-| `POST` | `/` | Send a message (with optional `model` field), get AI response |
-| `POST` | `/documents` | Upload PDF/DOCX/TXT, adds to RAG |
-| `POST` | `/image` | Upload image, AI describes and responds |
+| `POST` | `/` | Send a message (with `model` and `provider` fields), get AI response |
+| `POST` | `/documents` | Upload PDF/DOCX/TXT (max 5MB), adds to RAG |
+| `POST` | `/image` | Upload image (max 5MB), AI describes and responds |
 
 ### Models — `/api/v1/models`
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/get_models` | Returns list of available chat models |
+| `GET` | `/get_models` | Returns list of available chat models with provider info |
 
 All endpoints except auth and `/get_models` require a Bearer token in the `Authorization` header.
 
@@ -175,7 +176,7 @@ The agent follows a priority order: time-sensitive → RAG → web → own knowl
 
 ## Model selector
 
-The frontend fetches available models from `/api/v1/models/get_models` on load and renders them as chips in the input bar. The selected model is passed as a `model` field in every message request and persists in `localStorage` across sessions.
+The frontend fetches available models from `/api/v1/models/get_models` on load and renders them as chips in the input bar. Each model object includes a `provider` field which is sent alongside the `model` field in every message request. The selected model and provider persist in `localStorage` across sessions.
 
 To add or remove models, edit the `MODELS` list in `routers/models.py` — no frontend changes needed.
 
@@ -204,14 +205,8 @@ OTP emails use a custom Nexus-styled HTML template matching the app's dark theme
 | `SECRET_KEY` | JWT signing secret |
 | `GROQ_API_KEY` | Groq API key for LLM inference |
 | `PINECONE_API_KEY` | Pinecone vector DB key |
+| `VOYAGE_API_KEY` | Voyage AI embeddings key |
 | `TAVILY_API_KEY` | Tavily web tools key |
 | `CF_ACCOUNT_ID` | Cloudflare account ID |
 | `CF_API_TOKEN` | Cloudflare Workers AI token (needs Workers AI permissions) |
 | `BREVO_API_KEY` | Brevo transactional email key |
-
----
-
-## Built by
-
-**Aarush Srivatsa**
-[LinkedIn](https://www.linkedin.com/in/aarushsrivatsa/) · [GitHub](https://github.com/AarushSrivatsa)
