@@ -13,3 +13,5 @@ argon2-cffi
 python-jose
 requests
 langchain-ollama
+asyncpg
+pydantic[email]
