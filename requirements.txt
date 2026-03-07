@@ -21,4 +21,5 @@ apscheduler
 pypdf
 docx2txt
 voyageai
+alembic
 python-dotenv
