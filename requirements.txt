@@ -3,6 +3,7 @@ langchain-groq
 fastapi
 httpx
 uvicorn
+pyyaml>=6.0.2
 langchain-core
 langchain_community
 langchain_classic
