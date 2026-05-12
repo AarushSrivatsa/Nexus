@@ -19,7 +19,7 @@ router = APIRouter(
     tags=["messages"]
 )
 
-DEFAULT_MODEL = "moonshotai/kimi-k2-instruct-0905"
+DEFAULT_MODEL = "openai/gpt-oss-120b"
 DEFAULT_PROVIDER = "groq"
 MAX_DOCUMENT_SIZE = 10 * 1024 * 1024
 MAX_IMAGE_SIZE = 10 * 1024 * 1024
