@@ -8,8 +8,12 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
+
 CF_API_TOKEN = os.getenv("CF_API_TOKEN")
 CF_ACCOUNT_ID = os.getenv("CF_ACCOUNT_ID")
+R2_BUCKET_NAME = os.getenv("R2_BUCKET_NAME")
+R2_PUBLIC_URL = os.getenv("R2_PUBLIC_URL")
+
 VOYAGE_API_KEY = os.getenv("VOYAGE_API_KEY")
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
@@ -43,6 +47,7 @@ FILE_EVENT_PREFIX = "024b4faf-5861-4f6b-840c-8f9b4cb660b1_"
 
 BREVO_SENDER_EMAIL = "pitlaaarushsrivatsa@gmail.com"
 BREVO_API_KEY = os.getenv("BREVO_API_KEY")
+
 
 REQUIRED_ENV_VARS = ["DATABASE_URL", "GROQ_API_KEY", "PINECONE_API_KEY", "TAVILY_API_KEY", "CF_API_TOKEN", "CF_ACCOUNT_ID", "BREVO_API_KEY"]
 missing = [var for var in REQUIRED_ENV_VARS if not os.getenv(var)]

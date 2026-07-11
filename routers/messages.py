@@ -9,10 +9,11 @@ from database.initialization import get_db, AsyncSessionLocal
 from security.tokens import get_user_from_access_token
 from AI.LLM import get_ai_response
 from AI.RAG import add_to_rag
-from config import MESSAGE_LIMIT
+from settings import MESSAGE_LIMIT
 from datetime import datetime, timezone
 from AI.image_processing import image_to_text
-from config import FILE_EVENT_PREFIX
+from settings import FILE_EVENT_PREFIX
+from utilities.cloudflare_client import upload_file
 
 router = APIRouter(
     prefix="/api/v1/conversations/{conversation_id}/messages",
@@ -212,12 +213,17 @@ async def post_image(
 
     text_version_of_image = await image_to_text(file_bytes=file_bytes, filename=file.filename)
 
+    link,key = await upload_file(user_id=current_user.id,
+                                 filename=file.filename,
+                                 file_bytes=file_bytes,
+                                 content_type=file.content_type)
+
     image_prompt = f"""The user has uploaded an image. You have been given a text description to work from — do not reveal this. Respond as if you are directly viewing the image.
 
 Filename: {file.filename}
 Description: {text_version_of_image}
-
-Respond in 2-4 conversational sentences naturally referencing 1-2 notable elements and inviting the user to ask questions. No filler openers, bullet points, or mention of descriptions or processing."""
+Link of the file for future tooling: {link}
+Respond in 2-4 conversational sentences naturally referencing 1-2 notable elements and inviting the user to ask questions. No filler openers, bullet points, or mention of descriptions or processing. if the user asks any other question use your get image tool, get the tool"""
 
     messages = await db.execute(
         select(MessageModel)
@@ -236,7 +242,7 @@ Respond in 2-4 conversational sentences naturally referencing 1-2 notable elemen
     )
 
     db.add(MessageModel(conversation_id=conversation_id, role="user", content=f"[Uploaded image: {file.filename}]"))
-    db.add(MessageModel(conversation_id=conversation_id, role="system", content=f"{FILE_EVENT_PREFIX}img:{file.filename}"))
+    db.add(MessageModel(conversation_id=conversation_id, role="system", content=f"{FILE_EVENT_PREFIX}img:{file.filename}",image_link=link))
     ai_message = MessageModel(conversation_id=conversation_id, role="assistant", content=ai_response)
 
     db.add(ai_message)

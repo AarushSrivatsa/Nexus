@@ -2,7 +2,7 @@ from langchain_tavily import TavilySearch, TavilyCrawl, TavilyExtract, TavilyMap
 from langchain.tools import tool
 
 from datetime import datetime
-from config import TAVILY_API_KEY
+from settings import TAVILY_API_KEY
 
 search = TavilySearch(
     max_results=3,                   

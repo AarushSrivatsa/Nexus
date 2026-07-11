@@ -2,7 +2,7 @@ from datetime import datetime, timezone, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from uuid import UUID  
-from config import ALGORITHM, SECRET_KEY, ACCESS_TOKEN_EXPIRE_HOURS, REFRESH_TOKEN_EXPIRE_DAYS
+from settings import ALGORITHM, SECRET_KEY, ACCESS_TOKEN_EXPIRE_HOURS, REFRESH_TOKEN_EXPIRE_DAYS
 from jose import jwt
 from secrets import token_urlsafe
 from hashlib import sha256

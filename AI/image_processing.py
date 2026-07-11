@@ -1,6 +1,6 @@
 import httpx
 from fastapi import HTTPException
-from config import CF_ACCOUNT_ID, CF_API_TOKEN
+from settings import CF_ACCOUNT_ID, CF_API_TOKEN
 
 IMAGE_TO_TEXT_PROMPT = "You are acting as an intermediatory between an LLM that understands only text and image. Describe whatever you can from that image how ever elaborately possible. Leave no minute detail unturned. Try to infer the image too."
 

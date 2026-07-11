@@ -13,7 +13,7 @@ from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader, Te
 from langchain_community.document_compressors import FlashrankRerank
 from langchain_classic.retrievers.contextual_compression import ContextualCompressionRetriever
 
-from config import INDEX_NAME, EMBEDDING_MODEL, CHUNK_SIZE, CHUNK_OVERLAP, SEPARATORS, BASE_K, TOP_N, USE_RERANKING, RERANK_MODEL, DIMENSIONS
+from settings import INDEX_NAME, EMBEDDING_MODEL, CHUNK_SIZE, CHUNK_OVERLAP, SEPARATORS, BASE_K, TOP_N, USE_RERANKING, RERANK_MODEL, DIMENSIONS
 
 pc = Pinecone()
 

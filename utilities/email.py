@@ -1,7 +1,7 @@
 import secrets
 import requests
 from fastapi import BackgroundTasks
-from config import BREVO_API_KEY, BREVO_SENDER_EMAIL
+from settings import BREVO_API_KEY, BREVO_SENDER_EMAIL
 from datetime import datetime
 
 def generate_otp(length: int = 6) -> str:

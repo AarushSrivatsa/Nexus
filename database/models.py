@@ -43,7 +43,7 @@ class MessageModel(Base):
     content = Column(Text, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     convo = relationship("ConvoModel", back_populates="messages")
-
+    image_link = Column(Text,nullable=True)
     __table_args__ = (
         Index('ix_messages_conv_created', 'conversation_id', 'created_at'),
     )
