@@ -1,0 +1,172 @@
+/* ═══════════════════════════════════════════════════════════
+   NEXUS — theme layer (sits alongside Tailwind utilities)
+   Anything Tailwind can't express cleanly lives here:
+   gradients-as-text, keyframes, markdown rendering, scrollbars.
+   ═══════════════════════════════════════════════════════════ */
+
+@font-face { font-display: swap; }
+
+html, body { height: 100%; }
+body {
+  background: #05080d;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: -300px; right: -300px;
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(0,229,255,.04) 0%, transparent 65%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* thin scrollbars, desktop only */
+@media (hover: hover) {
+  .scroll-thin::-webkit-scrollbar { width: 3px; height: 3px; }
+  .scroll-thin::-webkit-scrollbar-track { background: transparent; }
+  .scroll-thin::-webkit-scrollbar-thumb { background: #1e2e42; border-radius: 3px; }
+}
+
+:focus-visible { outline: 2px solid #00e5ff; outline-offset: 3px; }
+button:focus:not(:focus-visible) { outline: none; }
+
+/* gradient wordmark */
+.text-gradient {
+  background: linear-gradient(135deg, #00e5ff, #0066ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ── motion ──────────────────────────────────────────────── */
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.anim-rise { animation: rise .28s cubic-bezier(.16,1,.3,1); }
+
+@keyframes tdot { 0%, 60%, 100% { transform: translateY(0); opacity: .3; } 30% { transform: translateY(-6px); opacity: 1; } }
+.tdot { width: 5px; height: 5px; border-radius: 50%; background: #3a5470; animation: tdot 1.4s infinite; }
+.tdot:nth-child(2) { animation-delay: .18s; }
+.tdot:nth-child(3) { animation-delay: .36s; }
+
+@keyframes spin-slow { to { transform: rotate(360deg); } }
+.animate-spin-slow { animation: spin-slow 2.4s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-rise, .tdot, .animate-spin-slow { animation: none !important; }
+}
+
+/* ── markdown rendering inside chat bubbles ─────────────────
+   Tailwind's typography plugin isn't loaded via CDN, so the
+   bubble content is rendered by app.js and styled here. */
+.md a {
+  color: #00e5ff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(0,229,255,.35);
+  word-break: break-all;
+}
+.md a:hover { color: #fff; text-decoration-color: #00e5ff; }
+.msg-row.user .md a { color: rgba(0,0,0,.75); text-decoration-color: rgba(0,0,0,.25); }
+.msg-row.user .md a:hover { color: #000; text-decoration-color: rgba(0,0,0,.6); }
+
+.md pre {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  background: rgba(0,0,0,.4);
+  border: 1px solid #1e2e42;
+  padding: 14px 16px;
+  border-radius: 12px;
+  overflow-x: auto;
+  margin: 10px 0 4px;
+  line-height: 1.65;
+  color: #00e5ff;
+}
+.msg-row.user .md pre { background: rgba(0,0,0,.2); border-color: rgba(0,0,0,.15); color: #000; }
+.md pre code { background: none; padding: 0; border: none; font-size: inherit; color: inherit; }
+
+.md code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  background: #111e2e;
+  padding: 2px 6px;
+  border-radius: 5px;
+  color: #00e5ff;
+  border: 1px solid #1e2e42;
+  word-break: break-word;
+}
+.msg-row.user .md code { background: rgba(0,0,0,.15); color: #000; border-color: rgba(0,0,0,.1); }
+
+.md .mh1 { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; margin: 18px 0 6px; color: #eef4ff; line-height: 1.3; }
+.md .mh2 { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; margin: 14px 0 5px; color: #eef4ff; line-height: 1.3; }
+.md .mh3 { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700; margin: 12px 0 4px; color: #eef4ff; line-height: 1.3; }
+.md .mh1:first-child, .md .mh2:first-child, .md .mh3:first-child { margin-top: 2px; }
+.msg-row.user .md .mh1, .msg-row.user .md .mh2, .msg-row.user .md .mh3 { color: #000; }
+
+.md p { margin: 0 0 10px; line-height: 1.75; }
+.md p:last-child { margin-bottom: 0; }
+
+.md ul, .md ol { margin: 6px 0 10px; padding-left: 0; list-style: none; }
+.md ul:last-child, .md ol:last-child { margin-bottom: 0; }
+.md li { padding: 3px 0 3px 22px; position: relative; line-height: 1.7; }
+.md ul li::before { content: '•'; position: absolute; left: 7px; color: #00e5ff; font-size: 15px; line-height: 1.7; }
+.md ol { counter-reset: ol-c; }
+.md ol li { counter-increment: ol-c; }
+.md ol li::before { content: counter(ol-c) '.'; position: absolute; left: 0; color: #00e5ff; font-size: 11px; font-family: 'JetBrains Mono', monospace; font-weight: 600; line-height: 2; }
+.msg-row.user .md ul li::before, .msg-row.user .md ol li::before { color: rgba(0,0,0,.5); }
+
+.md hr { border: none; border-top: 1px solid #1e2e42; margin: 14px 0; }
+.md blockquote { border-left: 3px solid rgba(0,229,255,.35); padding-left: 14px; margin: 8px 0; color: #7a9bbf; font-style: italic; line-height: 1.7; }
+.msg-row.user .md blockquote { border-left-color: rgba(0,0,0,.2); color: rgba(0,0,0,.7); }
+.msg-row.user .md hr { border-top-color: rgba(0,0,0,.15); }
+.msg-row.user .md strong { color: #000; }
+
+/* mobile viewport fix for 100dvh where dvh is unsupported */
+.h-dvh-fallback { height: 100vh; height: 100dvh; }
+
+/* ── modal open/close mechanics ──────────────────────────────
+   Kept in plain CSS rather than toggled Tailwind utility classes:
+   the responsive variants (max-[680px]:...) are their own class
+   strings, so toggling a differently-named plain class from JS
+   would silently fail to override them. A single `.open` switch
+   sidesteps that entirely. */
+.modal-bg {
+  position: fixed; inset: 0;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .22s cubic-bezier(.4,0,.2,1);
+}
+.modal-bg.open { opacity: 1; pointer-events: all; }
+
+.modal-box {
+  transform: translateY(18px) scale(.95);
+  transition: transform .3s cubic-bezier(.16,1,.3,1);
+}
+.modal-bg.open .modal-box { transform: translateY(0) scale(1); }
+
+@media (max-width: 680px) {
+  .modal-box { transform: translateY(100%); }
+  .modal-bg.open .modal-box { transform: translateY(0); }
+}
+
+/* ── sidebar open/close (mobile) ─────────────────────────── */
+#sidebar { transition: transform .3s cubic-bezier(.16,1,.3,1); }
+@media (max-width: 680px) {
+  #sidebar {
+    position: fixed; top: 0; left: 0;
+    height: 100vh; height: 100dvh;
+    z-index: 50;
+    transform: translateX(-100%);
+    border-right: none !important;
+  }
+  #sidebar.open {
+    transform: translateX(0);
+    border-right: 1px solid #162030 !important;
+    box-shadow: 12px 0 60px rgba(0,0,0,.8);
+  }
+}
+#sb-overlay { transition: opacity .28s cubic-bezier(.4,0,.2,1); }

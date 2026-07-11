@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#05080d">
+    <title>Create account · Nexus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/static/js/tailwind.config.js"></script>
+    <link rel="stylesheet" href="/static/css/theme.css">
+</head>
+
+<body class="h-dvh-fallback flex font-body text-ink-1 text-sm">
+
+    <div class="w-full overflow-y-auto scroll-thin flex items-start justify-center px-0"
+        style="padding-top:max(44px,calc(env(safe-area-inset-top,0px) + 24px));padding-bottom:max(44px,calc(env(safe-area-inset-bottom,0px) + 24px))">
+        <div class="w-full max-w-[400px] px-7 m-auto anim-rise">
+
+            <!-- Logo -->
+            <div class="flex items-center gap-3 mb-9">
+                <div
+                    class="w-11 h-11 rounded-[13px] bg-gradient-to-br from-accent to-accent2 flex items-center justify-center shrink-0 shadow-glow">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <line x1="5" y1="12" x2="19" y2="12" stroke="#000" stroke-width="1.5" stroke-opacity=".35" />
+                        <line x1="12" y1="5" x2="12" y2="19" stroke="#000" stroke-width="1.5" stroke-opacity=".35" />
+                        <line x1="5" y1="12" x2="12" y2="5" stroke="#000" stroke-width="1.5" stroke-opacity=".35" />
+                        <line x1="12" y1="5" x2="19" y2="12" stroke="#000" stroke-width="1.5" stroke-opacity=".35" />
+                        <line x1="19" y1="12" x2="12" y2="19" stroke="#000" stroke-width="1.5" stroke-opacity=".35" />
+                        <line x1="12" y1="19" x2="5" y2="12" stroke="#000" stroke-width="1.5" stroke-opacity=".35" />
+                        <circle cx="5" cy="12" r="2" fill="#000" />
+                        <circle cx="19" cy="12" r="2" fill="#000" />
+                        <circle cx="12" cy="5" r="2" fill="#000" />
+                        <circle cx="12" cy="19" r="2" fill="#000" />
+                        <circle cx="12" cy="12" r="3" fill="#000" />
+                    </svg>
+                </div>
+                <div>
+                    <span class="font-display text-lg font-bold tracking-[.18em] text-gradient">NEXUS</span>
+                    <div class="text-[10px] text-ink-3 font-display font-medium tracking-wide mt-0.5">by <a
+                            href="https://www.linkedin.com/in/aarushsrivatsa/" target="_blank" rel="noopener"
+                            class="hover:text-accent transition-colors">Aarush Srivatsa</a></div>
+                </div>
+            </div>
+
+            <h1 class="font-display text-2xl font-semibold tracking-tight mb-1.5" id="s-heading">Create account</h1>
+            <p class="text-[13px] text-ink-3 mb-7 leading-relaxed" id="s-sub">Get started in a few seconds</p>
+
+            <!-- Step 1: details -->
+            <form id="s-step-email" novalidate>
+                <div class="mb-3.5">
+                    <label for="s-email"
+                        class="block font-display text-[10px] font-bold tracking-wider uppercase text-ink-3 mb-1.5">Email</label>
+                    <input type="email" id="s-email" placeholder="you@example.com" autocomplete="email"
+                        inputmode="email"
+                        class="w-full px-4 py-3 bg-surface-1 border border-line-1 rounded-xl text-base text-ink-1 outline-none transition-[border-color,box-shadow] focus:border-accent/70 focus:ring-4 focus:ring-accent/10 placeholder:text-ink-3">
+                </div>
+                <div class="mb-3.5">
+                    <label for="s-pass"
+                        class="block font-display text-[10px] font-bold tracking-wider uppercase text-ink-3 mb-1.5">Password</label>
+                    <div class="relative">
+                        <input type="password" id="s-pass" placeholder="Min 8 characters" autocomplete="new-password"
+                            class="w-full px-4 py-3 pr-12 bg-surface-1 border border-line-1 rounded-xl text-base text-ink-1 outline-none transition-[border-color,box-shadow] focus:border-accent/70 focus:ring-4 focus:ring-accent/10 placeholder:text-ink-3">
+                        <button type="button" onclick="Nexus.togglePw('s-pass',this)" aria-label="Show password"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-ink-3 hover:text-ink-2 transition-colors">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-3.5">
+                    <label for="s-pass2"
+                        class="block font-display text-[10px] font-bold tracking-wider uppercase text-ink-3 mb-1.5">Confirm
+                        password</label>
+                    <div class="relative">
+                        <input type="password" id="s-pass2" placeholder="Repeat password" autocomplete="new-password"
+                            class="w-full px-4 py-3 pr-12 bg-surface-1 border border-line-1 rounded-xl text-base text-ink-1 outline-none transition-[border-color,box-shadow] focus:border-accent/70 focus:ring-4 focus:ring-accent/10 placeholder:text-ink-3">
+                        <button type="button" onclick="Nexus.togglePw('s-pass2',this)" aria-label="Show password"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-ink-3 hover:text-ink-2 transition-colors">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit"
+                    class="w-full mt-2 py-3.5 bg-gradient-to-br from-accent to-accent2 rounded-xl font-display text-[13px] font-bold text-black tracking-wide shadow-[0_4px_24px_rgba(0,229,255,.13)] transition-all hover:opacity-90 hover:shadow-[0_6px_32px_rgba(0,229,255,.23)] active:scale-[.97] disabled:opacity-40 disabled:cursor-not-allowed min-h-[48px]">
+                    Send code →
+                </button>
+                <div class="text-xs text-danger mt-2.5 min-h-[18px] font-medium leading-relaxed" id="s-err" role="alert"
+                    aria-live="assertive"></div>
+            </form>
+
+            <!-- Step 2: OTP -->
+            <form id="s-step-otp" class="hidden" novalidate>
+                <div
+                    class="mb-3.5 px-4 py-2.5 bg-surface-2 border border-line-1 rounded-xl flex items-center justify-between gap-2">
+                    <span id="s-email-display" class="text-xs text-ink-2 font-medium truncate"></span>
+                    <button type="button" onclick="goBackToEmail()"
+                        class="font-display text-[11px] font-bold text-accent shrink-0">Wrong email?</button>
+                </div>
+                <div class="mb-3.5">
+                    <label for="s-otp"
+                        class="block font-display text-[10px] font-bold tracking-wider uppercase text-ink-3 mb-1.5">Verification
+                        code</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="s-otp" placeholder="000000" maxlength="6" inputmode="numeric"
+                            pattern="[0-9]*" autocomplete="one-time-code"
+                            class="flex-1 min-w-0 px-4 py-3 bg-surface-1 border border-line-1 rounded-xl text-center font-mono text-xl tracking-[.2em] text-ink-1 outline-none transition-[border-color,box-shadow] focus:border-accent/70 focus:ring-4 focus:ring-accent/10">
+                        <button type="button" id="s-resend-btn" onclick="resendOTP()" disabled
+                            class="px-3.5 bg-surface-2 border border-line-1 rounded-xl font-display text-[11px] font-bold text-ink-2 whitespace-nowrap transition-colors hover:enabled:border-line-2 hover:enabled:text-ink-1 disabled:opacity-35 disabled:cursor-not-allowed">
+                            Resend <span id="s-timer"></span>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit"
+                    class="w-full mt-2 py-3.5 bg-gradient-to-br from-accent to-accent2 rounded-xl font-display text-[13px] font-bold text-black tracking-wide shadow-[0_4px_24px_rgba(0,229,255,.13)] transition-all hover:opacity-90 hover:shadow-[0_6px_32px_rgba(0,229,255,.23)] active:scale-[.97] disabled:opacity-40 disabled:cursor-not-allowed min-h-[48px]">
+                    Verify →
+                </button>
+                <div class="text-xs text-danger mt-2.5 min-h-[18px] font-medium leading-relaxed" id="s-err2"
+                    role="alert" aria-live="assertive"></div>
+            </form>
+
+            <p class="text-center text-[13px] text-ink-3 mt-7" id="s-footer-link">
+                Already have an account? <a href="/login"
+                    class="text-accent font-semibold hover:text-white transition-colors">Sign in →</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="/static/js/common.js"></script>
+    <script src="/static/js/signup.js"></script>
+</body>
+
+</html>

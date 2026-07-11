@@ -28,12 +28,7 @@ async def lifespan(app: FastAPI):
 DEBUG = os.getenv("DEBUG", "false").lower() == "true"
 
 app = FastAPI(
-    title="Chatbot Wrapper Backend",
-    description="""
-Built by **Aarush Srivatsa**
-GitHub Docs Link: https://github.com/AarushSrivatsa/Chatbot-Wrapper-Project-Backend-OpenDocs
-Linkedin Profile: https://www.linkedin.com/in/aarushsrivatsa/
-""", 
+    title="Nexus",
     lifespan=lifespan,
     docs_url="/docs" if DEBUG else None,
     redoc_url="/redoc" if DEBUG else None,
@@ -46,5 +41,21 @@ for router in router_list:
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
-async def serve_frontend():
+async def serve_root():
     return FileResponse("static/index.html")
+
+@app.get("/login")
+async def serve_login():
+    return FileResponse("static/login.html")
+
+@app.get("/signup")
+async def serve_signup():
+    return FileResponse("static/signup.html")
+
+@app.get("/reset-password")
+async def serve_reset_password():
+    return FileResponse("static/reset.html")
+
+@app.get("/app")
+async def serve_app():
+    return FileResponse("static/app.html")
