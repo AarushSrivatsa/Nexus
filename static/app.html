@@ -1,258 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#05080d">
-    <title>Nexus</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
-        rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/static/js/tailwind.config.js"></script>
-    <link rel="stylesheet" href="/static/css/theme.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#05080d">
+<link rel="icon" href="/static/logo.png">
+<title>Nexus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="/static/js/tailwind.config.js"></script>
+<link rel="stylesheet" href="/static/css/theme.css">
 </head>
-
 <body class="h-dvh-fallback flex font-body text-ink-1 text-sm overflow-hidden">
 
-    <!-- Sidebar backdrop (mobile) -->
-    <div id="sb-overlay" onclick="closeSidebar()" aria-hidden="true"
-        class="fixed inset-0 bg-black/65 backdrop-blur-sm z-[49] opacity-0 pointer-events-none max-[680px]:block hidden">
-    </div>
+<!-- Sidebar backdrop (mobile) -->
+<div id="sb-overlay" onclick="closeSidebar()" aria-hidden="true"
+  class="fixed inset-0 bg-black/65 backdrop-blur-sm z-[49] opacity-0 pointer-events-none max-[680px]:block hidden"></div>
 
-    <!-- ═══════════════════════════ SIDEBAR ═══════════════════════════ -->
-    <nav id="sidebar" aria-label="Conversations" class="w-[272px] bg-surface-1 border-r border-line-1 flex flex-col shrink-0 relative z-[1]
+<!-- ═══════════════════════════ SIDEBAR ═══════════════════════════ -->
+<nav id="sidebar" aria-label="Conversations"
+  class="w-[272px] bg-surface-1 border-r border-line-1 flex flex-col shrink-0 relative z-[1]
          max-[680px]:w-[82vw] max-[680px]:border-r-0">
-        <div class="px-4 pb-3.5 border-b border-line-1 flex items-center shrink-0"
-            style="padding-top:max(16px,calc(env(safe-area-inset-top,0px) + 10px))">
-            <div class="flex items-center gap-2.5">
-                <div
-                    class="w-7 h-7 rounded-lg bg-gradient-to-br from-accent to-accent2 flex items-center justify-center shrink-0 shadow-glow-sm">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <circle cx="5" cy="12" r="2" fill="#000" />
-                        <circle cx="19" cy="12" r="2" fill="#000" />
-                        <circle cx="12" cy="5" r="2" fill="#000" />
-                        <circle cx="12" cy="19" r="2" fill="#000" />
-                        <line x1="5" y1="12" x2="19" y2="12" stroke="#000" stroke-width="1.5" stroke-opacity=".4" />
-                        <line x1="12" y1="5" x2="12" y2="19" stroke="#000" stroke-width="1.5" stroke-opacity=".4" />
-                        <line x1="5" y1="12" x2="12" y2="5" stroke="#000" stroke-width="1.5" stroke-opacity=".4" />
-                        <line x1="12" y1="5" x2="19" y2="12" stroke="#000" stroke-width="1.5" stroke-opacity=".4" />
-                        <line x1="19" y1="12" x2="12" y2="19" stroke="#000" stroke-width="1.5" stroke-opacity=".4" />
-                        <line x1="12" y1="19" x2="5" y2="12" stroke="#000" stroke-width="1.5" stroke-opacity=".4" />
-                        <circle cx="12" cy="12" r="2.5" fill="#000" />
-                    </svg>
-                </div>
-                <div class="flex flex-col gap-0.5">
-                    <span class="font-display text-[13px] font-bold tracking-[.12em] text-gradient">NEXUS</span>
-                    <span class="text-[9px] text-ink-3 font-display font-medium tracking-wide">by <a
-                            href="https://www.linkedin.com/in/aarushsrivatsa/" target="_blank" rel="noopener"
-                            class="hover:text-accent transition-colors">Aarush Srivatsa</a></span>
-                </div>
-            </div>
+  <div class="px-4 pb-3.5 border-b border-line-1 flex items-center shrink-0" style="padding-top:max(16px,calc(env(safe-area-inset-top,0px) + 10px))">
+    <div class="flex items-center gap-2.5">
+      <img src="/static/logo.png" alt="Nexus" class="w-9 h-9 object-contain shrink-0 drop-shadow-[0_0_14px_rgba(255,184,0,.4)]">
+      <div class="flex flex-col gap-0.5">
+        <span class="font-display text-[13px] font-bold tracking-[.12em] text-gradient">NEXUS</span>
+        <span class="text-[9px] text-ink-3 font-display font-medium tracking-wide">by <a href="https://www.linkedin.com/in/aarushsrivatsa/" target="_blank" rel="noopener" class="hover:text-accent transition-colors">Aarush Srivatsa</a></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="px-2.5 pt-2.5 pb-1 shrink-0">
+    <button onclick="openNewChat()" aria-label="New conversation"
+      class="w-full py-2.5 px-3.5 bg-accent/10 border border-accent/20 rounded-[11px] font-display text-xs font-bold text-accent tracking-wide transition-all hover:bg-accent/[.14] hover:border-accent/35 hover:shadow-[0_0_18px_rgba(255,184,0,.18)] active:scale-[.98] flex items-center justify-center gap-1.5 min-h-[42px]">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New conversation
+    </button>
+  </div>
+
+  <div class="flex-1 overflow-y-auto scroll-thin px-2 py-1" id="sb-list" role="list" aria-label="Conversation list"></div>
+
+  <div class="p-2.5 border-t border-line-1 shrink-0" style="padding-bottom:max(10px,calc(env(safe-area-inset-bottom,0px) + 8px))">
+    <button onclick="handleLogout()"
+      class="w-full py-2.5 bg-transparent border border-danger/20 rounded-[11px] font-display text-xs font-bold text-danger tracking-wide transition-all hover:bg-danger/[.06] hover:border-danger/35 flex items-center justify-center gap-1.5 min-h-[44px]">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign out
+    </button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════ MAIN ═══════════════════════════ -->
+<main id="main" class="flex-1 flex flex-col overflow-hidden relative z-[1] min-w-0">
+  <div class="h-[52px] border-b border-line-1 bg-surface-1 flex items-center justify-between gap-2.5 shrink-0 px-5">
+    <button onclick="openSidebar()" aria-label="Open menu"
+      class="hidden max-[680px]:flex w-9 h-9 border border-line-1 rounded-[9px] items-center justify-center text-ink-3 transition-colors hover:border-line-2 hover:text-ink-2 hover:bg-surface-2 active:scale-90">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="font-display text-[13px] font-semibold text-ink-2 tracking-wide flex-1 min-w-0 truncate" id="topbar-title">Select a conversation</span>
+    <button onclick="openNewChat()" aria-label="New conversation"
+      class="hidden max-[680px]:flex w-9 h-9 border border-line-1 rounded-[9px] items-center justify-center text-ink-3 transition-colors hover:border-line-2 hover:text-ink-2 hover:bg-surface-2 active:scale-90">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+  </div>
+
+  <div id="messages" role="log" aria-live="polite" aria-label="Conversation messages"
+    class="flex-1 overflow-y-auto scroll-thin flex flex-col gap-2.5 px-[11%] py-8 max-[680px]:px-[4%] max-[680px]:py-4 max-[680px]:gap-1.5 min-[1200px]:px-[18%] min-[1200px]:py-10">
+    <div class="no-conv flex-1 flex flex-col items-center justify-center gap-3.5 pb-14 pointer-events-none anim-rise">
+      <div class="w-[52px] h-[52px] rounded-2xl bg-gradient-to-br from-accent/[.09] to-accent2/[.04] border border-accent/[.12] flex items-center justify-center text-2xl">✦</div>
+      <div class="font-display text-[15px] font-semibold text-ink-2">Start a conversation</div>
+      <div class="text-xs text-ink-3 text-center max-w-[260px] leading-relaxed">Web search · Document memory · Vision</div>
+    </div>
+  </div>
+
+  <div class="px-[11%] pt-1.5 pb-3.5 shrink-0 max-[680px]:px-2.5 max-[680px]:pb-2.5 min-[1200px]:px-[18%] min-[1200px]:pb-4.5" style="padding-bottom:max(14px,calc(env(safe-area-inset-bottom,0px) + 8px))">
+    <div class="flex flex-col bg-surface-1 border border-line-2 rounded-2xl pt-2 px-2 pb-1.5 pl-4 transition-[border-color,box-shadow] focus-within:border-accent/60 focus-within:ring-4 focus-within:ring-accent/10" id="input-wrap">
+      <div class="flex items-end gap-2">
+        <textarea id="msg-input" placeholder="Message Nexus…" rows="1"
+          class="flex-1 border-none bg-transparent text-base text-ink-1 outline-none resize-none max-h-40 leading-relaxed py-0.5 placeholder:text-ink-3"
+          autocomplete="off" autocorrect="on" autocapitalize="sentences" spellcheck="true" aria-label="Message"></textarea>
+        <div class="flex gap-1 items-center shrink-0 pb-0.5">
+          <button onclick="openUpload()" aria-label="Attach file"
+            class="w-[34px] h-[34px] border border-line-2 rounded-[9px] flex items-center justify-center text-ink-3 transition-all hover:border-accent/35 hover:text-accent hover:bg-accent/10 active:scale-90">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+          </button>
+          <button id="send-btn" onclick="sendMessage()" aria-label="Send message"
+            class="w-[34px] h-[34px] bg-gradient-to-br from-accent to-accent2 rounded-[9px] flex items-center justify-center text-black shadow-[0_2px_14px_rgba(255,184,0,.22)] transition-all hover:opacity-90 hover:shadow-[0_4px_22px_rgba(255,184,0,.32)] active:scale-[.88] disabled:opacity-20 disabled:cursor-not-allowed disabled:shadow-none">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
         </div>
+      </div>
 
-        <div class="px-2.5 pt-2.5 pb-1 shrink-0">
-            <button onclick="openNewChat()" aria-label="New conversation"
-                class="w-full py-2.5 px-3.5 bg-accent/10 border border-accent/20 rounded-[11px] font-display text-xs font-bold text-accent tracking-wide transition-all hover:bg-accent/[.14] hover:border-accent/35 hover:shadow-[0_0_18px_rgba(0,229,255,.15)] active:scale-[.98] flex items-center justify-center gap-1.5 min-h-[42px]">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <line x1="12" y1="5" x2="12" y2="19" />
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-                New conversation
-            </button>
+      <!-- Model selector — dropdown -->
+      <div class="flex items-center gap-2 pt-1.5 pb-0.5 mt-1 border-t border-line-1 relative">
+        <span class="font-display text-[9px] font-bold tracking-[.12em] uppercase text-ink-3 shrink-0">Model</span>
+        <div class="relative">
+          <button type="button" id="model-btn" onclick="toggleModelMenu()" aria-haspopup="listbox" aria-expanded="false"
+            class="flex items-center gap-1.5 pl-2.5 pr-2 py-1 rounded-full border border-line-1 bg-transparent font-display text-[11px] font-bold text-ink-2 tracking-wide transition-colors hover:border-line-2 hover:text-ink-1 hover:bg-surface-2 min-h-[26px]">
+            <span class="w-1.5 h-1.5 rounded-full bg-accent shrink-0"></span>
+            <span id="model-btn-label">Loading…</span>
+            <svg id="model-btn-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-ink-3 transition-transform duration-200"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+
+          <!-- Listbox: opens upward, anchored above the trigger -->
+          <div id="model-menu" role="listbox" aria-label="Available models"
+            class="hidden absolute bottom-full left-0 mb-2 w-72 max-w-[80vw] bg-surface-2 border border-line-2 rounded-2xl shadow-2xl p-1.5 z-20 max-h-[60vh] overflow-y-auto scroll-thin">
+          </div>
         </div>
+      </div>
+    </div>
+  </div>
+</main>
 
-        <div class="flex-1 overflow-y-auto scroll-thin px-2 py-1" id="sb-list" role="list"
-            aria-label="Conversation list"></div>
+<!-- ═══════════════════════════ MODALS ═══════════════════════════ -->
 
-        <div class="p-2.5 border-t border-line-1 shrink-0"
-            style="padding-bottom:max(10px,calc(env(safe-area-inset-bottom,0px) + 8px))">
-            <button onclick="handleLogout()"
-                class="w-full py-2.5 bg-transparent border border-danger/20 rounded-[11px] font-display text-xs font-bold text-danger tracking-wide transition-all hover:bg-danger/[.06] hover:border-danger/35 flex items-center justify-center gap-1.5 min-h-[44px]">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
-                    <polyline points="16 17 21 12 16 7" />
-                    <line x1="21" y1="12" x2="9" y2="12" />
-                </svg>
-                Sign out
-            </button>
-        </div>
-    </nav>
-
-    <!-- ═══════════════════════════ MAIN ═══════════════════════════ -->
-    <main id="main" class="flex-1 flex flex-col overflow-hidden relative z-[1] min-w-0">
-        <div
-            class="h-[52px] border-b border-line-1 bg-surface-1 flex items-center justify-between gap-2.5 shrink-0 px-5">
-            <button onclick="openSidebar()" aria-label="Open menu"
-                class="hidden max-[680px]:flex w-9 h-9 border border-line-1 rounded-[9px] items-center justify-center text-ink-3 transition-colors hover:border-line-2 hover:text-ink-2 hover:bg-surface-2 active:scale-90">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <line x1="3" y1="6" x2="21" y2="6" />
-                    <line x1="3" y1="12" x2="21" y2="12" />
-                    <line x1="3" y1="18" x2="21" y2="18" />
-                </svg>
-            </button>
-            <span class="font-display text-[13px] font-semibold text-ink-2 tracking-wide flex-1 min-w-0 truncate"
-                id="topbar-title">Select a conversation</span>
-            <button onclick="openNewChat()" aria-label="New conversation"
-                class="hidden max-[680px]:flex w-9 h-9 border border-line-1 rounded-[9px] items-center justify-center text-ink-3 transition-colors hover:border-line-2 hover:text-ink-2 hover:bg-surface-2 active:scale-90">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <line x1="12" y1="5" x2="12" y2="19" />
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-            </button>
-        </div>
-
-        <div id="messages" role="log" aria-live="polite" aria-label="Conversation messages"
-            class="flex-1 overflow-y-auto scroll-thin flex flex-col gap-2.5 px-[11%] py-8 max-[680px]:px-[4%] max-[680px]:py-4 max-[680px]:gap-1.5 min-[1200px]:px-[18%] min-[1200px]:py-10">
-            <div
-                class="no-conv flex-1 flex flex-col items-center justify-center gap-3.5 pb-14 pointer-events-none anim-rise">
-                <div
-                    class="w-[52px] h-[52px] rounded-2xl bg-gradient-to-br from-accent/[.09] to-accent2/[.04] border border-accent/[.12] flex items-center justify-center text-2xl">
-                    ✦</div>
-                <div class="font-display text-[15px] font-semibold text-ink-2">Start a conversation</div>
-                <div class="text-xs text-ink-3 text-center max-w-[260px] leading-relaxed">Web search · Document memory ·
-                    Vision</div>
-            </div>
-        </div>
-
-        <div class="px-[11%] pt-1.5 pb-3.5 shrink-0 max-[680px]:px-2.5 max-[680px]:pb-2.5 min-[1200px]:px-[18%] min-[1200px]:pb-4.5"
-            style="padding-bottom:max(14px,calc(env(safe-area-inset-bottom,0px) + 8px))">
-            <div class="flex flex-col bg-surface-1 border border-line-2 rounded-2xl pt-2 px-2 pb-1.5 pl-4 transition-[border-color,box-shadow] focus-within:border-accent/60 focus-within:ring-4 focus-within:ring-accent/10"
-                id="input-wrap">
-                <div class="flex items-end gap-2">
-                    <textarea id="msg-input" placeholder="Message Nexus…" rows="1"
-                        class="flex-1 border-none bg-transparent text-base text-ink-1 outline-none resize-none max-h-40 leading-relaxed py-0.5 placeholder:text-ink-3"
-                        autocomplete="off" autocorrect="on" autocapitalize="sentences" spellcheck="true"
-                        aria-label="Message"></textarea>
-                    <div class="flex gap-1 items-center shrink-0 pb-0.5">
-                        <button onclick="openUpload()" aria-label="Attach file"
-                            class="w-[34px] h-[34px] border border-line-2 rounded-[9px] flex items-center justify-center text-ink-3 transition-all hover:border-accent/35 hover:text-accent hover:bg-accent/10 active:scale-90">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <path
-                                    d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
-                            </svg>
-                        </button>
-                        <button id="send-btn" onclick="sendMessage()" aria-label="Send message"
-                            class="w-[34px] h-[34px] bg-gradient-to-br from-accent to-accent2 rounded-[9px] flex items-center justify-center text-black shadow-[0_2px_14px_rgba(0,229,255,.17)] transition-all hover:opacity-90 hover:shadow-[0_4px_22px_rgba(0,229,255,.27)] active:scale-[.88] disabled:opacity-20 disabled:cursor-not-allowed disabled:shadow-none">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2.5">
-                                <line x1="22" y1="2" x2="11" y2="13" />
-                                <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Model selector — dropdown -->
-                <div class="flex items-center gap-2 pt-1.5 pb-0.5 mt-1 border-t border-line-1 relative">
-                    <span
-                        class="font-display text-[9px] font-bold tracking-[.12em] uppercase text-ink-3 shrink-0">Model</span>
-                    <div class="relative">
-                        <button type="button" id="model-btn" onclick="toggleModelMenu()" aria-haspopup="listbox"
-                            aria-expanded="false"
-                            class="flex items-center gap-1.5 pl-2.5 pr-2 py-1 rounded-full border border-line-1 bg-transparent font-display text-[11px] font-bold text-ink-2 tracking-wide transition-colors hover:border-line-2 hover:text-ink-1 hover:bg-surface-2 min-h-[26px]">
-                            <span class="w-1.5 h-1.5 rounded-full bg-accent shrink-0"></span>
-                            <span id="model-btn-label">Loading…</span>
-                            <svg id="model-btn-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2.5"
-                                class="text-ink-3 transition-transform duration-200">
-                                <polyline points="6 9 12 15 18 9" />
-                            </svg>
-                        </button>
-
-                        <!-- Listbox: opens upward, anchored above the trigger -->
-                        <div id="model-menu" role="listbox" aria-label="Available models"
-                            class="hidden absolute bottom-full left-0 mb-2 w-72 max-w-[80vw] bg-surface-2 border border-line-2 rounded-2xl shadow-2xl p-1.5 z-20 max-h-[60vh] overflow-y-auto scroll-thin">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- ═══════════════════════════ MODALS ═══════════════════════════ -->
-
-    <!-- New chat -->
-    <div id="new-chat-modal" role="dialog" aria-modal="true" aria-labelledby="nc-title"
-        onclick="handleModalBgClick(event,'new-chat-modal')" class="modal-bg bg-black/[.78] backdrop-blur-md flex items-center justify-center p-5
+<!-- New chat -->
+<div id="new-chat-modal" role="dialog" aria-modal="true" aria-labelledby="nc-title" onclick="handleModalBgClick(event,'new-chat-modal')"
+  class="modal-bg bg-black/[.78] backdrop-blur-md flex items-center justify-center p-5
          max-[680px]:items-end max-[680px]:p-0">
-        <div class="modal-box bg-surface-1 border border-line-2 rounded-[22px] p-7 w-full max-w-[360px] shadow-2xl max-h-[calc(100dvh-48px)] overflow-y-auto scroll-thin
-              max-[680px]:max-w-full max-[680px]:rounded-b-none max-[680px]:rounded-t-[24px] max-[680px]:pt-5"
-            style="padding-bottom:max(22px,calc(env(safe-area-inset-bottom,0px) + 16px))">
-            <div class="hidden max-[680px]:block w-9 h-1 rounded-full bg-line-2 mx-auto mb-5"></div>
-            <div class="font-display text-base font-bold mb-1" id="nc-title">New conversation</div>
-            <div class="text-xs text-ink-3 mb-5 leading-relaxed">Give it a name to get started</div>
-            <div class="mb-0">
-                <label for="new-title"
-                    class="block font-display text-[10px] font-bold tracking-wider uppercase text-ink-3 mb-1.5">Title</label>
-                <input type="text" id="new-title" placeholder="e.g. Research, Coding, Ideas…" maxlength="60"
-                    autocomplete="off" onkeydown="if(event.key==='Enter')confirmNewChat()"
-                    class="w-full px-4 py-3 bg-surface-2 border border-line-1 rounded-xl text-base text-ink-1 outline-none transition-[border-color,box-shadow] focus:border-accent/70 focus:ring-4 focus:ring-accent/10 placeholder:text-ink-3">
-            </div>
-            <div class="flex gap-2 justify-end mt-5">
-                <button onclick="closeModal('new-chat-modal')"
-                    class="px-4.5 py-2.5 bg-transparent border border-line-2 rounded-[10px] font-display text-xs font-bold text-ink-2 transition-colors hover:text-ink-1 min-h-[42px]">Cancel</button>
-                <button onclick="confirmNewChat()"
-                    class="px-5 py-2.5 bg-gradient-to-br from-accent to-accent2 rounded-[10px] font-display text-xs font-bold text-black min-h-[42px] shadow-[0_2px_12px_rgba(0,229,255,.13)] transition-opacity hover:opacity-90 active:scale-[.97]">Create
-                    →</button>
-            </div>
-        </div>
+  <div class="modal-box bg-surface-1 border border-line-2 rounded-[22px] p-7 w-full max-w-[360px] shadow-2xl max-h-[calc(100dvh-48px)] overflow-y-auto scroll-thin
+              max-[680px]:max-w-full max-[680px]:rounded-b-none max-[680px]:rounded-t-[24px] max-[680px]:pt-5" style="padding-bottom:max(22px,calc(env(safe-area-inset-bottom,0px) + 16px))">
+    <div class="hidden max-[680px]:block w-9 h-1 rounded-full bg-line-2 mx-auto mb-5"></div>
+    <div class="font-display text-base font-bold mb-1" id="nc-title">New conversation</div>
+    <div class="text-xs text-ink-3 mb-5 leading-relaxed">Give it a name to get started</div>
+    <div class="mb-0">
+      <label for="new-title" class="block font-display text-[10px] font-bold tracking-wider uppercase text-ink-3 mb-1.5">Title</label>
+      <input type="text" id="new-title" placeholder="e.g. Research, Coding, Ideas…" maxlength="60" autocomplete="off"
+        onkeydown="if(event.key==='Enter')confirmNewChat()"
+        class="w-full px-4 py-3 bg-surface-2 border border-line-1 rounded-xl text-base text-ink-1 outline-none transition-[border-color,box-shadow] focus:border-accent/70 focus:ring-4 focus:ring-accent/10 placeholder:text-ink-3">
+    </div>
+    <div class="flex gap-2 justify-end mt-5">
+      <button onclick="closeModal('new-chat-modal')" class="px-4.5 py-2.5 bg-transparent border border-line-2 rounded-[10px] font-display text-xs font-bold text-ink-2 transition-colors hover:text-ink-1 min-h-[42px]">Cancel</button>
+      <button onclick="confirmNewChat()" class="px-5 py-2.5 bg-gradient-to-br from-accent to-accent2 rounded-[10px] font-display text-xs font-bold text-black min-h-[42px] shadow-[0_2px_12px_rgba(255,184,0,.18)] transition-opacity hover:opacity-90 active:scale-[.97]">Create →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Upload -->
+<div id="upload-modal" role="dialog" aria-modal="true" aria-labelledby="up-title" onclick="handleModalBgClick(event,'upload-modal')"
+  class="modal-bg bg-black/[.78] backdrop-blur-md flex items-center justify-center p-5
+         max-[680px]:items-end max-[680px]:p-0">
+  <div class="modal-box bg-surface-1 border border-line-2 rounded-[22px] p-7 w-full max-w-[420px] shadow-2xl max-h-[calc(100dvh-48px)] overflow-y-auto scroll-thin
+              max-[680px]:max-w-full max-[680px]:rounded-b-none max-[680px]:rounded-t-[24px] max-[680px]:pt-5" style="padding-bottom:max(22px,calc(env(safe-area-inset-bottom,0px) + 16px))">
+    <div class="hidden max-[680px]:block w-9 h-1 rounded-full bg-line-2 mx-auto mb-5"></div>
+    <div class="font-display text-base font-bold mb-1" id="up-title">Attach file</div>
+    <div class="text-xs text-ink-3 mb-4 leading-relaxed">Upload a document or image to this conversation</div>
+
+    <div class="flex gap-1 bg-surface-2 border border-line-1 rounded-xl p-1 mb-4" role="tablist">
+      <button class="up-tab flex-1 py-2.5 border-none bg-surface-3 rounded-lg font-display text-xs font-bold text-ink-1 transition-all min-h-[38px]" data-type="doc" onclick="switchUpTab('doc')" role="tab" aria-selected="true">Document</button>
+      <button class="up-tab flex-1 py-2.5 border-none bg-transparent rounded-lg font-display text-xs font-bold text-ink-3 transition-all min-h-[38px]" data-type="img" onclick="switchUpTab('img')" role="tab" aria-selected="false">Image</button>
     </div>
 
-    <!-- Upload -->
-    <div id="upload-modal" role="dialog" aria-modal="true" aria-labelledby="up-title"
-        onclick="handleModalBgClick(event,'upload-modal')" class="modal-bg bg-black/[.78] backdrop-blur-md flex items-center justify-center p-5
-         max-[680px]:items-end max-[680px]:p-0">
-        <div class="modal-box bg-surface-1 border border-line-2 rounded-[22px] p-7 w-full max-w-[420px] shadow-2xl max-h-[calc(100dvh-48px)] overflow-y-auto scroll-thin
-              max-[680px]:max-w-full max-[680px]:rounded-b-none max-[680px]:rounded-t-[24px] max-[680px]:pt-5"
-            style="padding-bottom:max(22px,calc(env(safe-area-inset-bottom,0px) + 16px))">
-            <div class="hidden max-[680px]:block w-9 h-1 rounded-full bg-line-2 mx-auto mb-5"></div>
-            <div class="font-display text-base font-bold mb-1" id="up-title">Attach file</div>
-            <div class="text-xs text-ink-3 mb-4 leading-relaxed">Upload a document or image to this conversation</div>
-
-            <div class="flex gap-1 bg-surface-2 border border-line-1 rounded-xl p-1 mb-4" role="tablist">
-                <button
-                    class="up-tab flex-1 py-2.5 border-none bg-surface-3 rounded-lg font-display text-xs font-bold text-ink-1 transition-all min-h-[38px]"
-                    data-type="doc" onclick="switchUpTab('doc')" role="tab" aria-selected="true">Document</button>
-                <button
-                    class="up-tab flex-1 py-2.5 border-none bg-transparent rounded-lg font-display text-xs font-bold text-ink-3 transition-all min-h-[38px]"
-                    data-type="img" onclick="switchUpTab('img')" role="tab" aria-selected="false">Image</button>
-            </div>
-
-            <div id="dropzone" role="button" tabindex="0" aria-label="Click to browse files or drag and drop"
-                onclick="document.getElementById('file-input').click()"
-                onkeydown="if(event.key==='Enter'||event.key===' ')document.getElementById('file-input').click()"
-                ondragover="event.preventDefault();this.classList.add('border-accent/70','bg-accent/10')"
-                ondragleave="this.classList.remove('border-accent/70','bg-accent/10')" ondrop="onDrop(event)"
-                class="border border-dashed border-line-2 rounded-2xl py-8 px-5 text-center cursor-pointer transition-all mb-3 hover:border-accent/70 hover:bg-accent/10">
-                <div class="text-[28px] mb-2.5" id="dz-icon" aria-hidden="true">📄</div>
-                <div class="text-xs text-ink-3 leading-relaxed"><strong class="text-ink-2">Click to browse</strong> or
-                    drag &amp; drop<br><span id="dz-types">PDF, DOCX, TXT</span></div>
-            </div>
-            <input type="file" id="file-input" accept=".pdf,.docx,.txt" onchange="onFileSelect(event)"
-                aria-hidden="true" tabindex="-1" class="hidden">
-            <div id="file-name" role="status" aria-live="polite"
-                class="text-xs text-accent min-h-[18px] font-semibold pt-0.5 leading-relaxed"></div>
-
-            <div class="flex gap-2 justify-end mt-5">
-                <button onclick="closeModal('upload-modal')"
-                    class="px-4.5 py-2.5 bg-transparent border border-line-2 rounded-[10px] font-display text-xs font-bold text-ink-2 transition-colors hover:text-ink-1 min-h-[42px]">Cancel</button>
-                <button onclick="doUpload()"
-                    class="px-5 py-2.5 bg-gradient-to-br from-accent to-accent2 rounded-[10px] font-display text-xs font-bold text-black min-h-[42px] shadow-[0_2px_12px_rgba(0,229,255,.13)] transition-opacity hover:opacity-90 active:scale-[.97]">Upload
-                    →</button>
-            </div>
-        </div>
+    <div id="dropzone" role="button" tabindex="0" aria-label="Click to browse files or drag and drop"
+      onclick="document.getElementById('file-input').click()"
+      onkeydown="if(event.key==='Enter'||event.key===' ')document.getElementById('file-input').click()"
+      ondragover="event.preventDefault();this.classList.add('border-accent/70','bg-accent/10')"
+      ondragleave="this.classList.remove('border-accent/70','bg-accent/10')"
+      ondrop="onDrop(event)"
+      class="border border-dashed border-line-2 rounded-2xl py-8 px-5 text-center cursor-pointer transition-all mb-3 hover:border-accent/70 hover:bg-accent/10">
+      <div class="text-[28px] mb-2.5" id="dz-icon" aria-hidden="true">📄</div>
+      <div class="text-xs text-ink-3 leading-relaxed"><strong class="text-ink-2">Click to browse</strong> or drag &amp; drop<br><span id="dz-types">PDF, DOCX, TXT</span></div>
     </div>
+    <input type="file" id="file-input" accept=".pdf,.docx,.txt" onchange="onFileSelect(event)" aria-hidden="true" tabindex="-1" class="hidden">
+    <div id="file-name" role="status" aria-live="polite" class="text-xs text-accent min-h-[18px] font-semibold pt-0.5 leading-relaxed"></div>
 
-    <script src="/static/js/common.js"></script>
-    <script src="/static/js/app.js"></script>
+    <div class="flex gap-2 justify-end mt-5">
+      <button onclick="closeModal('upload-modal')" class="px-4.5 py-2.5 bg-transparent border border-line-2 rounded-[10px] font-display text-xs font-bold text-ink-2 transition-colors hover:text-ink-1 min-h-[42px]">Cancel</button>
+      <button onclick="doUpload()" class="px-5 py-2.5 bg-gradient-to-br from-accent to-accent2 rounded-[10px] font-display text-xs font-bold text-black min-h-[42px] shadow-[0_2px_12px_rgba(255,184,0,.18)] transition-opacity hover:opacity-90 active:scale-[.97]">Upload →</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/common.js"></script>
+<script src="/static/js/app.js"></script>
 </body>
-
 </html>

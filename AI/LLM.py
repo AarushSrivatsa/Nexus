@@ -4,6 +4,7 @@ from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from uuid import UUID
 from AI.RAG import make_query_rag_tool
 from AI.tools import universal_tools
+from AI.image_processing import make_view_image_tool
 from fastapi import HTTPException
 from database.models import MessageModel
 
@@ -23,12 +24,17 @@ You are Nexus — a sharp, fast AI with web access and document memory. Not a ge
 - `crawl` — user explicitly wants broad multi-page site coverage
 - `mapsite` — site structure questions only
 - `query_rag` — ALWAYS call before web search if documents have been uploaded
+- `view_image` — user asks something specific about an image already shared in this conversation
+  (colors, text in the image, counting objects, etc). Pass the exact filename as it appears in the
+  conversation history — not a link. Don't use it just to re-describe an image in general; only
+  when the existing description likely doesn't answer the question.
 
 # DECISION ORDER
 1. Time-sensitive? → `getDateAndTime` first
 2. Documents uploaded? → `query_rag` before anything else
-3. Needs current/external info? → `search` / `extract` / `crawl`
-4. Own knowledge sufficient? → Answer directly
+3. Question about a previously uploaded image? → `view_image`
+4. Needs current/external info? → `search` / `extract` / `crawl`
+5. Own knowledge sufficient? → Answer directly
 
 # RESPONSES
 - Concise by default. Complete, not padded.
@@ -61,10 +67,13 @@ async def get_ai_response(
 ) -> str:
     if provider == "groq":
         llm = ChatGroq(model=model, temperature=0.2)
+    else:
+        raise HTTPException(status_code=400, detail=f"Unsupported provider: {provider}")
 
     chat_history = db_to_langchain(messages=messages)
-    query = make_query_rag_tool(conversation_id=conversation_id)
-    all_tools = universal_tools + [query]
+    query_rag_tool = make_query_rag_tool(conversation_id=conversation_id)
+    view_image_tool = make_view_image_tool(conversation_id=conversation_id)
+    all_tools = universal_tools + [query_rag_tool, view_image_tool]
     agent = create_agent(model=llm, tools=all_tools)
     full_history = [system_prompt] + chat_history + [HumanMessage(content=user_message)]
 

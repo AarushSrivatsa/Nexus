@@ -24,4 +24,5 @@ docx2txt
 voyageai
 alembic
 python-dotenv
-cloudflare
+psycopg2
+boto3

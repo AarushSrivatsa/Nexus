@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from fastapi.concurrency import run_in_threadpool
 from pydantic import BaseModel, ConfigDict
 from uuid import UUID
+from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from database.models import ConvoModel, MessageModel, UserModel
@@ -12,7 +13,6 @@ from AI.RAG import add_to_rag
 from settings import MESSAGE_LIMIT
 from datetime import datetime, timezone
 from AI.image_processing import image_to_text
-from settings import FILE_EVENT_PREFIX
 from utilities.cloudflare_client import upload_file
 
 router = APIRouter(
@@ -30,6 +30,9 @@ class message_response_schema(BaseModel):
     role: str
     content: str
     created_at: datetime
+    attachment_type: Optional[str] = None
+    attachment_name: Optional[str] = None
+    image_link: Optional[str] = None
     model_config = ConfigDict(from_attributes=True)
 
 @router.get("/", response_model=list[message_response_schema])
@@ -105,15 +108,7 @@ async def post_message(
     return ai_message
 
 
-class post_document_response_schema(BaseModel):
-    id: UUID
-    role: str
-    content: str
-    created_at: datetime
-    model_config = ConfigDict(from_attributes=True)
-
-
-@router.post("/documents", response_model=post_document_response_schema)
+@router.post("/documents", response_model=message_response_schema)
 async def post_documents(
     conversation_id: UUID,
     file: UploadFile = File(...),
@@ -139,7 +134,7 @@ async def post_documents(
 
     file_bytes = await file.read()
     if len(file_bytes) > MAX_DOCUMENT_SIZE:
-        raise HTTPException(status_code=400, detail="File too large. Maximum size is 5MB")
+        raise HTTPException(status_code=400, detail="File too large. Maximum size is 10MB")
 
     try:
         await run_in_threadpool(add_to_rag, conversation_id, file_bytes, file.filename)
@@ -170,7 +165,15 @@ Respond in 2-3 conversational sentences acknowledging the document and letting t
             provider=DEFAULT_PROVIDER,
         )
 
-        db2.add(MessageModel(conversation_id=conversation_id, role="system", content=f"{FILE_EVENT_PREFIX}doc:{file.filename}"))
+        # One row for the upload event: LLM-visible content + attachment fields
+        # the frontend renders directly (no more separate hidden "system" pill).
+        db2.add(MessageModel(
+            conversation_id=conversation_id,
+            role="user",
+            content=f"[Uploaded document: {file.filename}]",
+            attachment_type="document",
+            attachment_name=file.filename,
+        ))
         ai_message = MessageModel(conversation_id=conversation_id, role="assistant", content=ai_response)
         db2.add(ai_message)
         await db2.commit()
@@ -179,75 +182,81 @@ Respond in 2-3 conversational sentences acknowledging the document and letting t
     return ai_message
 
 
-class post_image_response_schema(BaseModel):
-    id: UUID
-    role: str
-    content: str
-    created_at: datetime
-    model_config = ConfigDict(from_attributes=True)
-
-@router.post("/image", response_model=post_image_response_schema)
+@router.post("/image", response_model=message_response_schema)
 async def post_image(
     conversation_id: UUID,
     file: UploadFile = File(...),
     current_user: UserModel = Depends(get_user_from_access_token),
     db: AsyncSession = Depends(get_db)
 ):
-    ext = file.filename.split(".")[-1].lower()
-    if "." + ext not in [".png", ".jpg", ".jpeg", ".webp"]:
-        raise HTTPException(status_code=400, detail="Invalid file type")
+    try :
+        ext = file.filename.split(".")[-1].lower()
+        if "." + ext not in [".png", ".jpg", ".jpeg", ".webp"]:
+            raise HTTPException(status_code=400, detail="Invalid file type")
 
-    conversation = await db.execute(
-        select(ConvoModel).where(
-            ConvoModel.id == conversation_id,
-            ConvoModel.user_id == current_user.id
+        conversation = await db.execute(
+            select(ConvoModel).where(
+                ConvoModel.id == conversation_id,
+                ConvoModel.user_id == current_user.id
+            )
         )
-    )
-    conversation = conversation.scalar_one_or_none()
-    if not conversation:
-        raise HTTPException(status_code=404, detail="Conversation Not Found")
+        conversation = conversation.scalar_one_or_none()
+        if not conversation:
+            raise HTTPException(status_code=404, detail="Conversation Not Found")
 
-    file_bytes = await file.read()
-    if len(file_bytes) > MAX_IMAGE_SIZE:
-        raise HTTPException(status_code=400, detail="File too large. Maximum size is 5MB")
+        file_bytes = await file.read()
+        if len(file_bytes) > MAX_IMAGE_SIZE:
+            raise HTTPException(status_code=400, detail="File too large. Maximum size is 10MB")
 
-    text_version_of_image = await image_to_text(file_bytes=file_bytes, filename=file.filename)
+        text_version_of_image = await image_to_text(file_bytes=file_bytes, filename=file.filename)
 
-    link,key = await upload_file(user_id=current_user.id,
-                                 filename=file.filename,
-                                 file_bytes=file_bytes,
-                                 content_type=file.content_type)
+        link, key = await upload_file(user_id=current_user.id,
+                                    filename=file.filename,
+                                    file_bytes=file_bytes,
+                                    content_type=file.content_type)
 
-    image_prompt = f"""The user has uploaded an image. You have been given a text description to work from — do not reveal this. Respond as if you are directly viewing the image.
+        image_prompt = f"""The user has uploaded an image. You have been given a text description to work from — do not reveal this. Respond as if you are directly viewing the image.
 
-Filename: {file.filename}
-Description: {text_version_of_image}
-Link of the file for future tooling: {link}
-Respond in 2-4 conversational sentences naturally referencing 1-2 notable elements and inviting the user to ask questions. No filler openers, bullet points, or mention of descriptions or processing. if the user asks any other question use your get image tool, get the tool"""
+    Filename: {file.filename}
+    Description: {text_version_of_image}
 
-    messages = await db.execute(
-        select(MessageModel)
-        .where(MessageModel.conversation_id == conversation_id)
-        .order_by(MessageModel.created_at.desc())
-        .limit(MESSAGE_LIMIT)
-    )
-    messages = list(reversed(messages.scalars().all()))
+    Respond in 2-4 conversational sentences naturally referencing 1-2 notable elements and inviting the user to ask questions. No filler openers, bullet points, or mention of descriptions or processing. If the user later asks something specific about this image, you'll be able to call the view_image tool with this filename."""
 
-    ai_response = await get_ai_response(
-        user_message=image_prompt,
-        conversation_id=conversation_id,
-        messages=messages,
-        model=DEFAULT_MODEL,
-        provider=DEFAULT_PROVIDER,
-    )
+        messages = await db.execute(
+            select(MessageModel)
+            .where(MessageModel.conversation_id == conversation_id)
+            .order_by(MessageModel.created_at.desc())
+            .limit(MESSAGE_LIMIT)
+        )
+        messages = list(reversed(messages.scalars().all()))
 
-    db.add(MessageModel(conversation_id=conversation_id, role="user", content=f"[Uploaded image: {file.filename}]"))
-    db.add(MessageModel(conversation_id=conversation_id, role="system", content=f"{FILE_EVENT_PREFIX}img:{file.filename}",image_link=link))
-    ai_message = MessageModel(conversation_id=conversation_id, role="assistant", content=ai_response)
+        ai_response = await get_ai_response(
+            user_message=image_prompt,
+            conversation_id=conversation_id,
+            messages=messages,
+            model=DEFAULT_MODEL,
+            provider=DEFAULT_PROVIDER,
+        )
 
-    db.add(ai_message)
-    conversation.updated_at = datetime.now(timezone.utc)
+        # One row for the upload event: plain filename in `content` (so it's stable,
+        # short, easy-to-quote text for the model to pass to view_image later), the
+        # actual R2 link stored separately in image_link — the tool looks it up by
+        # filename, the model never has to see or reproduce the URL itself.
+        db.add(MessageModel(
+            conversation_id=conversation_id,
+            role="user",
+            content=f"[Uploaded image: {file.filename}]",
+            attachment_type="image",
+            attachment_name=file.filename,
+            image_link=link,
+        ))
+        ai_message = MessageModel(conversation_id=conversation_id, role="assistant", content=ai_response)
+        db.add(ai_message)
+        conversation.updated_at = datetime.now(timezone.utc)
 
-    await db.commit()
-    await db.refresh(ai_message)
-    return ai_message
+        await db.commit()
+        await db.refresh(ai_message)
+        return ai_message
+    except Exception as e:
+        print(e)
+        raise

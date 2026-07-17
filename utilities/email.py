@@ -1,7 +1,7 @@
 import secrets
 import requests
 from fastapi import BackgroundTasks
-from settings import BREVO_API_KEY, BREVO_SENDER_EMAIL
+from settings import BREVO_API_KEY, BREVO_SENDER_EMAIL, PUBLIC_APP_URL
 from datetime import datetime
 
 def generate_otp(length: int = 6) -> str:
@@ -10,6 +10,16 @@ def generate_otp(length: int = 6) -> str:
 
 def email_the_otp(email: str, otp: str):
     try:
+        # Email clients fetch images straight from the internet, so a relative
+        # /static/logo.png path won't resolve — needs an absolute URL. If
+        # PUBLIC_APP_URL isn't set, skip the image and fall back to the text
+        # wordmark only rather than showing a broken image icon.
+        logo_html = (
+            f'<img src="{PUBLIC_APP_URL}/static/logo.png" width="52" height="52" alt="Nexus" '
+            f'style="display:block;margin:0 auto 12px;border-radius:13px;">'
+            if PUBLIC_APP_URL else ''
+        )
+
         html = f"""<!DOCTYPE html>
 <html>
 <head>
@@ -27,27 +37,8 @@ def email_the_otp(email: str, otp: str):
           <!-- Logo -->
           <tr>
             <td style="padding-bottom:32px;text-align:center;">
-              <table cellpadding="0" cellspacing="0" style="margin:0 auto 12px;">
-                <tr>
-                  <td style="width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,#00e5ff,#0066ff);text-align:center;vertical-align:middle;box-shadow:0 0 32px #00e5ff3a,0 0 0 1px #00e5ff22;">
-                    <!-- Nexus SVG logo — connected nodes, matching app exactly -->
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:auto;">
-                      <line x1="5" y1="12" x2="19" y2="12" stroke="#000" stroke-width="1.5" stroke-opacity="0.35"/>
-                      <line x1="12" y1="5" x2="12" y2="19" stroke="#000" stroke-width="1.5" stroke-opacity="0.35"/>
-                      <line x1="5" y1="12" x2="12" y2="5" stroke="#000" stroke-width="1.5" stroke-opacity="0.35"/>
-                      <line x1="12" y1="5" x2="19" y2="12" stroke="#000" stroke-width="1.5" stroke-opacity="0.35"/>
-                      <line x1="19" y1="12" x2="12" y2="19" stroke="#000" stroke-width="1.5" stroke-opacity="0.35"/>
-                      <line x1="12" y1="19" x2="5" y2="12" stroke="#000" stroke-width="1.5" stroke-opacity="0.35"/>
-                      <circle cx="5" cy="12" r="2" fill="#000"/>
-                      <circle cx="19" cy="12" r="2" fill="#000"/>
-                      <circle cx="12" cy="5" r="2" fill="#000"/>
-                      <circle cx="12" cy="19" r="2" fill="#000"/>
-                      <circle cx="12" cy="12" r="3" fill="#000"/>
-                    </svg>
-                  </td>
-                </tr>
-              </table>
-              <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.18em;color:#00e5ff;">NEXUS</div>
+              {logo_html}
+              <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.18em;color:#ffb800;">NEXUS</div>
               <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:500;letter-spacing:0.04em;color:#3a5470;margin-top:3px;">by Aarush Srivatsa</div>
             </td>
           </tr>
@@ -57,7 +48,7 @@ def email_the_otp(email: str, otp: str):
             <td style="background:#080e16;border-radius:18px;border:1px solid #162030;overflow:hidden;">
 
               <!-- Accent bar -->
-              <div style="height:2px;background:linear-gradient(90deg,#00e5ff,#0066ff);"></div>
+              <div style="height:2px;background:linear-gradient(90deg,#ffb800,#ff8c00);"></div>
 
               <!-- Body -->
               <table width="100%" cellpadding="0" cellspacing="0">
@@ -75,7 +66,7 @@ def email_the_otp(email: str, otp: str):
                     <table width="100%" cellpadding="0" cellspacing="0">
                       <tr>
                         <td style="background:#05080d;border:1px solid #1e2e42;border-radius:14px;padding:32px 20px;text-align:center;">
-                          <span style="font-family:'JetBrains Mono',monospace;font-size:42px;font-weight:500;letter-spacing:16px;color:#00e5ff;text-indent:16px;display:inline-block;">
+                          <span style="font-family:'JetBrains Mono',monospace;font-size:42px;font-weight:500;letter-spacing:16px;color:#ffb800;text-indent:16px;display:inline-block;">
                             {otp}
                           </span>
                         </td>
@@ -85,8 +76,8 @@ def email_the_otp(email: str, otp: str):
                     <!-- Expiry badge -->
                     <table cellpadding="0" cellspacing="0" style="margin:18px 0 0;">
                       <tr>
-                        <td style="padding:7px 14px;background:#00e5ff12;border-radius:100px;border:1px solid #00e5ff22;">
-                          <span style="font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;color:#00e5ff;letter-spacing:0.06em;">
+                        <td style="padding:7px 14px;background:#ffb80012;border-radius:100px;border:1px solid #ffb80022;">
+                          <span style="font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;color:#ffb800;letter-spacing:0.06em;">
                             ⏳ &nbsp;EXPIRES IN 5 MINUTES
                           </span>
                         </td>

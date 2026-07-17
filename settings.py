@@ -19,6 +19,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_HOURS = 24
 REFRESH_TOKEN_EXPIRE_DAYS = 30
+R2_API_TOKEN = os.getenv("R2_API_TOKEN")
 
 class VoyageEmbeddings(Embeddings):
     def __init__(self):
@@ -43,13 +44,19 @@ TOP_N = 5
 USE_RERANKING = False
 RERANK_MODEL = "ms-marco-MiniLM-L-12-v2"
 MESSAGE_LIMIT = 25
-FILE_EVENT_PREFIX = "024b4faf-5861-4f6b-840c-8f9b4cb660b1_"
 
 BREVO_SENDER_EMAIL = "pitlaaarushsrivatsa@gmail.com"
 BREVO_API_KEY = os.getenv("BREVO_API_KEY")
 
+# Public base URL of the deployed app (e.g. https://nexus.yourdomain.com), no
+# trailing slash. Used only to build an absolute logo URL for the OTP email —
+# email clients fetch images straight from the internet, so a relative
+# /static/logo.png won't resolve. If unset, the email just skips the image
+# and falls back to the text wordmark.
+PUBLIC_APP_URL = os.getenv("PUBLIC_APP_URL", "").rstrip("/")
 
-REQUIRED_ENV_VARS = ["DATABASE_URL", "GROQ_API_KEY", "PINECONE_API_KEY", "TAVILY_API_KEY", "CF_API_TOKEN", "CF_ACCOUNT_ID", "BREVO_API_KEY"]
+
+REQUIRED_ENV_VARS = ["DATABASE_URL", "GROQ_API_KEY", "PINECONE_API_KEY", "TAVILY_API_KEY", "CF_API_TOKEN", "CF_ACCOUNT_ID", "BREVO_API_KEY", "SECRET_KEY"]
 missing = [var for var in REQUIRED_ENV_VARS if not os.getenv(var)]
 if missing:
     raise RuntimeError(f"Missing required environment variables: {', '.join(missing)}")

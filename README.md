@@ -1,12 +1,9 @@
 # NEXUS
-
-> A production-grade AI chat backend with real-time web access, document memory, and vision — built on FastAPI, LangChain, and Pinecone.
-
 ---
 
 ## What it does
 
-Nexus is a full-stack AI assistant backend that wraps a powerful LLM agent with:
+Nexus is an AI Wrapper, unlike every other ai wrapper
 
 - **Persistent conversations** — multi-turn chat stored in PostgreSQL, per-user isolated
 - **RAG (document memory)** — upload PDFs, DOCX, or TXT files; the AI can query them semantically using Pinecone vector search

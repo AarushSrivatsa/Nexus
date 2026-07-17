@@ -19,7 +19,7 @@ body::before {
   position: fixed;
   top: -300px; right: -300px;
   width: 700px; height: 700px;
-  background: radial-gradient(circle, rgba(0,229,255,.04) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(255,184,0,.05) 0%, transparent 65%);
   pointer-events: none;
   z-index: 0;
 }
@@ -31,12 +31,12 @@ body::before {
   .scroll-thin::-webkit-scrollbar-thumb { background: #1e2e42; border-radius: 3px; }
 }
 
-:focus-visible { outline: 2px solid #00e5ff; outline-offset: 3px; }
+:focus-visible { outline: 2px solid #ffb800; outline-offset: 3px; }
 button:focus:not(:focus-visible) { outline: none; }
 
 /* gradient wordmark */
 .text-gradient {
-  background: linear-gradient(135deg, #00e5ff, #0066ff);
+  background: linear-gradient(135deg, #ffb800, #ff8c00);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -55,21 +55,25 @@ button:focus:not(:focus-visible) { outline: none; }
 @keyframes spin-slow { to { transform: rotate(360deg); } }
 .animate-spin-slow { animation: spin-slow 2.4s linear infinite; }
 
+/* subtle electric flicker for the logo glow — used sparingly */
+@keyframes spark-pulse { 0%,100% { opacity: 1; } 45% { opacity: .55; } 50% { opacity: 1; } 52% { opacity: .7; } 55% { opacity: 1; } }
+.spark-pulse { animation: spark-pulse 3.2s ease-in-out infinite; }
+
 @media (prefers-reduced-motion: reduce) {
-  .anim-rise, .tdot, .animate-spin-slow { animation: none !important; }
+  .anim-rise, .tdot, .animate-spin-slow, .spark-pulse { animation: none !important; }
 }
 
 /* ── markdown rendering inside chat bubbles ─────────────────
    Tailwind's typography plugin isn't loaded via CDN, so the
    bubble content is rendered by app.js and styled here. */
 .md a {
-  color: #00e5ff;
+  color: #ffb800;
   text-decoration: underline;
   text-underline-offset: 3px;
-  text-decoration-color: rgba(0,229,255,.35);
+  text-decoration-color: rgba(255,184,0,.35);
   word-break: break-all;
 }
-.md a:hover { color: #fff; text-decoration-color: #00e5ff; }
+.md a:hover { color: #fff4b8; text-decoration-color: #ffb800; }
 .msg-row.user .md a { color: rgba(0,0,0,.75); text-decoration-color: rgba(0,0,0,.25); }
 .msg-row.user .md a:hover { color: #000; text-decoration-color: rgba(0,0,0,.6); }
 
@@ -83,7 +87,7 @@ button:focus:not(:focus-visible) { outline: none; }
   overflow-x: auto;
   margin: 10px 0 4px;
   line-height: 1.65;
-  color: #00e5ff;
+  color: #ffb800;
 }
 .msg-row.user .md pre { background: rgba(0,0,0,.2); border-color: rgba(0,0,0,.15); color: #000; }
 .md pre code { background: none; padding: 0; border: none; font-size: inherit; color: inherit; }
@@ -94,7 +98,7 @@ button:focus:not(:focus-visible) { outline: none; }
   background: #111e2e;
   padding: 2px 6px;
   border-radius: 5px;
-  color: #00e5ff;
+  color: #ffb800;
   border: 1px solid #1e2e42;
   word-break: break-word;
 }
@@ -112,17 +116,36 @@ button:focus:not(:focus-visible) { outline: none; }
 .md ul, .md ol { margin: 6px 0 10px; padding-left: 0; list-style: none; }
 .md ul:last-child, .md ol:last-child { margin-bottom: 0; }
 .md li { padding: 3px 0 3px 22px; position: relative; line-height: 1.7; }
-.md ul li::before { content: '•'; position: absolute; left: 7px; color: #00e5ff; font-size: 15px; line-height: 1.7; }
+.md ul li::before { content: '•'; position: absolute; left: 7px; color: #ffb800; font-size: 15px; line-height: 1.7; }
 .md ol { counter-reset: ol-c; }
 .md ol li { counter-increment: ol-c; }
-.md ol li::before { content: counter(ol-c) '.'; position: absolute; left: 0; color: #00e5ff; font-size: 11px; font-family: 'JetBrains Mono', monospace; font-weight: 600; line-height: 2; }
+.md ol li::before { content: counter(ol-c) '.'; position: absolute; left: 0; color: #ffb800; font-size: 11px; font-family: 'JetBrains Mono', monospace; font-weight: 600; line-height: 2; }
 .msg-row.user .md ul li::before, .msg-row.user .md ol li::before { color: rgba(0,0,0,.5); }
 
 .md hr { border: none; border-top: 1px solid #1e2e42; margin: 14px 0; }
-.md blockquote { border-left: 3px solid rgba(0,229,255,.35); padding-left: 14px; margin: 8px 0; color: #7a9bbf; font-style: italic; line-height: 1.7; }
+.md blockquote { border-left: 3px solid rgba(255,184,0,.35); padding-left: 14px; margin: 8px 0; color: #7a9bbf; font-style: italic; line-height: 1.7; }
 .msg-row.user .md blockquote { border-left-color: rgba(0,0,0,.2); color: rgba(0,0,0,.7); }
 .msg-row.user .md hr { border-top-color: rgba(0,0,0,.15); }
 .msg-row.user .md strong { color: #000; }
+
+/* ── image attachment cards ──────────────────────────────────
+   Deliberately NOT tied to the same percentage width as text
+   bubbles — a %-based width made images look cramped/tiny on
+   wide screens. Fixed cap instead, full-bleed on mobile. */
+.img-attachment {
+  width: 100%;
+  max-width: 360px;
+}
+.img-attachment img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+  object-fit: cover;
+}
+@media (max-width: 680px) {
+  .img-attachment { max-width: 82vw; }
+}
 
 /* mobile viewport fix for 100dvh where dvh is unsupported */
 .h-dvh-fallback { height: 100vh; height: 100dvh; }

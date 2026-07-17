@@ -3,7 +3,6 @@
 Nexus.requireAuth();
 
 /* ── CONSTANTS ───────────────────────────────────────────── */
-const FILE_PREFIX = '024b4faf-5861-4f6b-840c-8f9b4cb660b1_';
 // Matches the backend default in routers/messages.py — used only until
 // /api/v1/models/get_models responds.
 const FALLBACK_MODEL    = 'openai/gpt-oss-120b';
@@ -280,25 +279,42 @@ async function loadMsgs(id) {
 }
 
 function renderMsg(m) {
-  if (m.role === 'system' && m.content.startsWith(FILE_PREFIX)) {
-    const rest  = m.content.slice(FILE_PREFIX.length);
-    const colon = rest.indexOf(':');
-    const type  = rest.slice(0, colon);
-    const fname = rest.slice(colon + 1);
-    return `<div class="flex justify-center my-2">
-      <div class="bg-surface-2 border border-line-1 rounded-full px-4 py-1.5 text-[11px] text-ink-3 flex items-center gap-1.5 font-semibold max-w-[90%]">
-        <span>${type === 'img' ? '🖼️' : '📄'}</span><span class="truncate">${Nexus.esc(fname)}</span>
-      </div>
-    </div>`;
-  }
+  // System role is no longer used for uploads, but skip defensively in case
+  // anything else ever writes a system-role row.
   if (m.role === 'system') return '';
+
+  if (m.attachment_type === 'image') return renderImageAttachment(m);
+  if (m.attachment_type === 'document') return renderDocAttachment(m);
+
   const isUser = m.role === 'user';
   return `<div class="msg-row ${m.role} flex ${isUser ? 'justify-end' : 'justify-start'} anim-rise" role="article">
-    <div class="max-w-[72%] max-[680px]:max-w-[90%] px-4.5 py-3 text-[13.5px] leading-relaxed break-words
+    <div class="max-w-[76%] max-[680px]:max-w-[90%] px-5 py-3 text-[13.5px] leading-relaxed break-words
       ${isUser
-        ? 'bg-gradient-to-br from-accent to-accent2 text-black font-medium rounded-[20px_20px_5px_20px] shadow-[0_4px_20px_rgba(0,229,255,.1)]'
+        ? 'bg-gradient-to-br from-accent to-accent2 text-black font-medium rounded-[20px_20px_5px_20px] shadow-[0_4px_20px_rgba(255,184,0,.15)]'
         : 'bg-surface-2 text-ink-1 rounded-[20px_20px_20px_5px] border border-line-1'}">
       <div class="md">${fmt(m.content)}</div>
+    </div>
+  </div>`;
+}
+
+function renderImageAttachment(m) {
+  const isUser = m.role !== 'assistant';
+  const src = m.image_link ? Nexus.esc(m.image_link) : '';
+  return `<div class="flex ${isUser ? 'justify-end' : 'justify-start'} anim-rise" role="article">
+    <div class="img-attachment">
+      <a href="${src}" target="_blank" rel="noopener noreferrer" class="block rounded-2xl overflow-hidden border border-line-1 bg-surface-2 hover:border-accent/40 transition-colors">
+        ${src ? `<img src="${src}" alt="${Nexus.esc(m.attachment_name || 'Uploaded image')}" loading="lazy">`
+              : `<div class="h-40 flex items-center justify-center text-ink-3 text-xs">Image unavailable</div>`}
+      </a>
+      <div class="text-[10.5px] text-ink-3 mt-1.5 px-0.5 truncate">🖼️ ${Nexus.esc(m.attachment_name || 'image')}</div>
+    </div>
+  </div>`;
+}
+
+function renderDocAttachment(m) {
+  return `<div class="flex justify-center my-2">
+    <div class="bg-surface-2 border border-line-1 rounded-full px-4 py-1.5 text-[11px] text-ink-3 flex items-center gap-1.5 font-semibold max-w-[90%]">
+      <span>📄</span><span class="truncate">${Nexus.esc(m.attachment_name || 'document')}</span>
     </div>
   </div>`;
 }
@@ -403,7 +419,7 @@ async function sendMessage() {
 
   msgs.insertAdjacentHTML('beforeend',
     `<div class="msg-row user flex justify-end anim-rise" role="article">
-       <div class="max-w-[72%] max-[680px]:max-w-[90%] px-4.5 py-3 text-[13.5px] leading-relaxed break-words bg-gradient-to-br from-accent to-accent2 text-black font-medium rounded-[20px_20px_5px_20px] shadow-[0_4px_20px_rgba(0,229,255,.1)]">${Nexus.esc(text).replace(/\n/g, '<br>')}</div>
+       <div class="max-w-[76%] max-[680px]:max-w-[90%] px-5 py-3 text-[13.5px] leading-relaxed break-words bg-gradient-to-br from-accent to-accent2 text-black font-medium rounded-[20px_20px_5px_20px] shadow-[0_4px_20px_rgba(255,184,0,.15)]">${Nexus.esc(text).replace(/\n/g, '<br>')}</div>
      </div>`
   );
   msgs.insertAdjacentHTML('beforeend',

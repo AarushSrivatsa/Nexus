@@ -43,7 +43,14 @@ class MessageModel(Base):
     content = Column(Text, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     convo = relationship("ConvoModel", back_populates="messages")
-    image_link = Column(Text,nullable=True)
+
+    # Attachment metadata — replaces the old FILE_EVENT_PREFIX string-sniffing
+    # approach. One upload = one message row, tagged with these fields, instead
+    # of a separate hidden "system" pill message plus a plain-text user message.
+    attachment_type = Column(String, nullable=True)   # "image" | "document" | None
+    attachment_name = Column(String, nullable=True)   # original filename
+    image_link = Column(Text, nullable=True)          # R2 public URL — images only
+
     __table_args__ = (
         Index('ix_messages_conv_created', 'conversation_id', 'created_at'),
     )
