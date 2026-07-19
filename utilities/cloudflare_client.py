@@ -16,7 +16,6 @@ s3_client = boto3.client(
     config=Config(signature_version="s3v4", region_name="auto"),
 )
 
-
 async def upload_file(user_id: str, filename: str, file_bytes: bytes, content_type: str) -> tuple[str, str]:
     """Upload file and return (public_url, key)"""
     key = f"media/{user_id}/{uuid.uuid4()}_{filename}"
